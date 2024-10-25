@@ -1,4 +1,4 @@
 [submodule "pm4py-dcr"]
 	path = pm4py-dcr
 	url = https://github.com/paul-cvp/pm4py-dcr.git
-	branch = dcr_in_pm4py_revised
+	branch = feature/dcr_in_pm4py_revised
