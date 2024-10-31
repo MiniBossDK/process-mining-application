@@ -1,27 +1,23 @@
 import pm4py
-from pm4py import DcrGraph
-from pm4py.objects.log.obj import EventLog
 from pm4py.visualization.dcr import visualizer as dcr_visualizer
+import os
 
+def save_gviz_as_svg(gviz, output_path):
+    # Remove the extension if it exists
+    if output_path.endswith('.svg'):
+        output_path = output_path[:-4]
+    gviz.render(output_path, format='svg')
 
-def load(path: str) -> EventLog:
-    """
-    Loads a DCR graph from a file containing event logs specified by a path.
-
-    :param path: the path to the file containing the event log
-    :return: the DCR graph
-    :rtype: DcrGraph
-    """
-    return pm4py.read_xes(path)
-
+    # Delete the intermediate file if it exists
+    intermediate_file = output_path
+    if os.path.exists(intermediate_file):
+        os.remove(intermediate_file)
 
 def handle_load(path: str):
-    event_log = load(path)
+    event_log = pm4py.read_xes(path)
 
     graph, _ = pm4py.discover_dcr(event_log)
 
     # Visualize the DCR graph
     gviz = dcr_visualizer.apply(graph)
-    dcr_visualizer.view(gviz)
-
-    return graph
+    save_gviz_as_svg(gviz, 'output.svg')

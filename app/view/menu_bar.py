@@ -5,19 +5,25 @@ from app.controller.load_dcr_controller import handle_load
 
 
 class MenuBar(QMenuBar):
-    def __init__(self):
+    def __init__(self, example_instance):
         super().__init__()
-        load_action = QAction('Load', self)
+        self.example_instance = example_instance
+        load_action = QAction('Load Event Log', self)
         load_action.setStatusTip('Load Event Log')
-        load_action.triggered.connect(open_file_dialog)
+        load_action.triggered.connect(self.open_file_dialog)
 
         file_menu = self.addMenu('File')
         file_menu.addAction(load_action)
         self.show()
 
-def open_file_dialog():
-    file_dialog = QFileDialog()
-    file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
-    file_dialog.setNameFilter("All Event Log files (*.xes)")
-    file_dialog.fileSelected.connect(handle_load) # TODO - Change this to a more method suitable method
-    file_dialog.exec()
+    def open_file_dialog(self):
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+        file_dialog.setNameFilter("All Event Log files (*.xes)")
+        file_dialog.fileSelected.connect(self.handle_file_selected)
+        file_dialog.exec()
+
+
+    def handle_file_selected(self, file_path):
+        handle_load(file_path)
+        self.example_instance.load_image('output.svg')
