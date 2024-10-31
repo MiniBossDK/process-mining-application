@@ -1,7 +1,7 @@
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QFileDialog, QMenuBar
 
-from app.controller.load_dcr_controller import load
+from app.controller.load_dcr_controller import handle_load
 
 
 class MenuBar(QMenuBar):
@@ -19,5 +19,5 @@ def open_file_dialog():
     file_dialog = QFileDialog()
     file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
     file_dialog.setNameFilter("All Event Log files (*.xes)")
-    file_dialog.filesSelected.connect(load) # TODO - Change this to a more method suitable method
+    file_dialog.fileSelected.connect(handle_load) # TODO - Change this to a more method suitable method
     file_dialog.exec()
