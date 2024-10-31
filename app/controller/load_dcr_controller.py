@@ -1,6 +1,7 @@
 import pm4py
 from pm4py import DcrGraph
 from pm4py.objects.log.obj import EventLog
+from pm4py.visualization.dcr import visualizer as dcr_visualizer
 
 
 def load(path: str) -> EventLog:
@@ -16,4 +17,11 @@ def load(path: str) -> EventLog:
 
 def handle_load(path: str):
     event_log = load(path)
-    return None # TODO - Handle the
+
+    graph, _ = pm4py.discover_dcr(event_log)
+
+    # Visualize the DCR graph
+    gviz = dcr_visualizer.apply(graph)
+    dcr_visualizer.view(gviz)
+
+    return graph

@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QMainWindow, QApplication
 
 from app.view.menu_bar import MenuBar
 
-from app.view.main_window import MainWindow
+"from app.view.main_window import MainWindow"
 
 
 class Example(QMainWindow):
@@ -25,7 +25,7 @@ class Example(QMainWindow):
 def main():
     app = QApplication(sys.argv)
 
-    window = MainWindow()
+    window = Example()
     window.show()
     ex = Example()
     app.exec()
