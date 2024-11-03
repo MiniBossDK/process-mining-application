@@ -8,6 +8,12 @@ class MenuBar(QMenuBar):
     def __init__(self, example_instance):
         super().__init__()
         self.example_instance = example_instance
+
+
+        font = self.font()
+        font.setPointSize(12)
+        self.setFont(font)
+
         load_action = QAction('Load Event Log', self)
         load_action.setStatusTip('Load Event Log')
         load_action.triggered.connect(self.open_file_dialog)

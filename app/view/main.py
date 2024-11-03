@@ -1,9 +1,14 @@
 import os
 import sys
-from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QVBoxLayout, QWidget, QMessageBox, QScrollArea, QSlider
-from PySide6.QtGui import QPixmap, QImageReader, QPainter
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtSvg import QSvgRenderer
+
+from PySide6.QtSvgWidgets import QGraphicsSvgItem
+from PySide6.QtWidgets import QMainWindow, QApplication, QLabel, QVBoxLayout, QWidget, QMessageBox, QScrollArea, \
+    QSlider, QGraphicsScene, QGraphicsView, QGraphicsPixmapItem, QPushButton, QHBoxLayout
+from PySide6.QtGui import QPixmap, QPainter
+from PySide6.QtCore import Qt
+
+
+from app.view.graph_view import GraphicsView
 from app.view.menu_bar import MenuBar
 
 class Example(QMainWindow):
@@ -13,71 +18,92 @@ class Example(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        screen_size = QApplication.primaryScreen().availableGeometry().size()
-        self.setGeometry(0, 0, screen_size.width(), screen_size.height())
+        self.resize(1024, 768)
         self.setWindowTitle('Process Miner')
 
-        self.label = QLabel("No Event Log loaded")
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        font = self.label.font()
-        font.setPointSize(100)  # Adjust the font size as needed
-        self.label.setFont(font)
 
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidget(self.label)
-        self.scroll_area.setWidgetResizable(True)
-
+        self.scene = QGraphicsScene()
         self.zoom_slider = QSlider(Qt.Orientation.Horizontal)
+        self.view = GraphicsView(self.zoom_slider, self.scene)
+        self.view.setRenderHint(QPainter.RenderHint.Antialiasing)
+        self.view.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.BoundingRectViewportUpdate)
+
+
+        self.zoom_in_button = QPushButton("+")
+        self.zoom_in_button.clicked.connect(self.zoom_in)
+
+        self.zoom_out_button = QPushButton("-")
+        self.zoom_out_button.clicked.connect(self.zoom_out)
+
         self.zoom_slider.setMinimum(1)
         self.zoom_slider.setMaximum(500)
         self.zoom_slider.setValue(100)
         self.zoom_slider.valueChanged.connect(self.zoom_image)
 
+        self.zoom_percentage_label = QLabel("100%")
+
+
+        zoom_layout = QHBoxLayout()
+        zoom_layout.addWidget(self.zoom_out_button)
+        zoom_layout.addWidget(self.zoom_slider)
+        zoom_layout.addWidget(self.zoom_in_button)
+        zoom_layout.addWidget(self.zoom_percentage_label)
+
+
         layout = QVBoxLayout()
-        layout.addWidget(self.scroll_area)
-        layout.addWidget(self.zoom_slider)
+        layout.addLayout(zoom_layout)
+        layout.addWidget(self.view)
 
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
-        self.setMenuBar(MenuBar(self))
+
+
+        self.menu_bar = MenuBar(self)
+        font = self.menu_bar.font()
+        font.setPointSize(12)
+        self.menu_bar.setFont(font)
+        self.setMenuBar(self.menu_bar)
+
         self.show()
+
+    def zoom_in(self):
+        value = self.zoom_slider.value()
+        if value < self.zoom_slider.maximum():
+            self.zoom_slider.setValue(value + 10)
+
+    def zoom_out(self):
+        value = self.zoom_slider.value()
+        if value > self.zoom_slider.minimum():
+            self.zoom_slider.setValue(value - 10)
 
     def load_image(self, image_path):
         if not os.path.exists(image_path):
             QMessageBox.critical(self, "Error", f"File {image_path} does not exist.")
             return
 
+        self.scene.clear()
+
         if image_path.endswith('.svg'):
-            renderer = QSvgRenderer(image_path)
-            viewBox = renderer.viewBox()
-            new_width = viewBox.width()
-            new_height = viewBox.height()
-
-            self.pixmap = QPixmap(QSize(new_width, new_height))
-            self.pixmap.fill(Qt.GlobalColor.transparent)
-            painter = QPainter(self.pixmap)
-            renderer.render(painter)
-            painter.end()
+            svg_item = QGraphicsSvgItem(image_path)
+            self.scene.addItem(svg_item)
+            self.current_graphics_item = svg_item
         else:
-            reader = QImageReader(image_path)
-            image = reader.read()
-            if image.isNull():
-                QMessageBox.critical(self, "Error", f"Failed to load image {image_path}.")
-                return
-            self.pixmap = QPixmap.fromImage(image)
+            pixmap = QPixmap(image_path)
+            pixmap_item = QGraphicsPixmapItem(pixmap)
+            self.scene.addItem(pixmap_item)
+            self.current_graphics_item = pixmap_item
 
-        self.label.setPixmap(self.pixmap)
-        self.label.resize(self.pixmap.size())
+
+        self.view.fitInView(self.scene.itemsBoundingRect(), Qt.AspectRatioMode.KeepAspectRatio)
         self.zoom_slider.setValue(100)
 
     def zoom_image(self, value):
-        if hasattr(self, 'pixmap'):
-            scale_factor = value / 100.0
-            new_size = self.pixmap.size() * scale_factor
-            scaled_pixmap = self.pixmap.scaled(new_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-            self.label.setPixmap(scaled_pixmap)
-            self.label.resize(scaled_pixmap.size())
+        scale_factor = value / 100.0
+        self.view.resetTransform()
+        self.view.scale(scale_factor, scale_factor)
+        self.zoom_percentage_label.setText(f"{value}%")
+
 
 def main():
     app = QApplication(sys.argv)
