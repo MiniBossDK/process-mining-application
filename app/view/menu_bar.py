@@ -1,8 +1,8 @@
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QFileDialog, QMenuBar, QDialogButtonBox, QVBoxLayout, QLabel, QMessageBox
-from exceptiongroup import catch
+from PySide6.QtWidgets import QFileDialog, QMenuBar, QMessageBox
 
 from app.controller.load_dcr_controller import handle_load
+
 
 class MenuBar(QMenuBar):
     def __init__(self, example_instance):
