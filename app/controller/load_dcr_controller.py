@@ -17,7 +17,7 @@ def handle_load(path: str):
     event_log = pm4py.read_xes(path)
 
     graph, _ = pm4py.discover_dcr(event_log)
-
+#
     # Visualize the DCR graph
     gviz = dcr_visualizer.apply(graph)
     save_gviz_as_svg(gviz, 'output.svg')
