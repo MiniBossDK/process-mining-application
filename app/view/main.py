@@ -66,7 +66,7 @@ class Example(QMainWindow):
                 QMessageBox.critical(self, "Error", f"Failed to load image {image_path}.")
                 return
             self.pixmap = QPixmap.fromImage(image)
-
+        QMessageBox.information(self, "Success", "The file has been loaded successfully!")
         self.label.setPixmap(self.pixmap)
         self.label.resize(self.pixmap.size())
         self.zoom_slider.setValue(100)

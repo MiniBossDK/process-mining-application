@@ -1,8 +1,8 @@
 from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QFileDialog, QMenuBar
+from PySide6.QtWidgets import QFileDialog, QMenuBar, QDialogButtonBox, QVBoxLayout, QLabel, QMessageBox
+from exceptiongroup import catch
 
 from app.controller.load_dcr_controller import handle_load
-
 
 class MenuBar(QMenuBar):
     def __init__(self, example_instance):
@@ -25,5 +25,9 @@ class MenuBar(QMenuBar):
 
 
     def handle_file_selected(self, file_path):
-        handle_load(file_path)
+        try:
+            handle_load(file_path)
+        except Exception:
+            QMessageBox.critical(self, "Error", f"Failed to load event log. Try with a different file.")
+            return
         self.example_instance.load_image('output.svg')
