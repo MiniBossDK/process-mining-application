@@ -1,8 +1,10 @@
 import os
 import sys
-from PySide6.QtWidgets import (QMainWindow, QApplication, QLabel, QVBoxLayout, QWidget,
-                               QMessageBox, QScrollArea, QSlider, QTableWidget, QTableWidgetItem,
-                               QPushButton, QHBoxLayout, QSizePolicy)
+from PySide6.QtWidgets import (
+    QMainWindow, QApplication, QLabel, QVBoxLayout, QWidget,
+    QMessageBox, QScrollArea, QSlider, QTableWidget, QTableWidgetItem,
+    QPushButton, QHBoxLayout, QSizePolicy
+)
 from PySide6.QtGui import QPixmap, QImageReader, QPainter
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtSvg import QSvgRenderer
@@ -10,8 +12,8 @@ from app.view.menu_bar import MenuBar
 
 class Example(QMainWindow):
 
-    def _init_(self):
-        super(Example, self)._init_()
+    def __init__(self):
+        super().__init__()
         self.current_file_path = None
         self.data = None
         self.init_ui()
@@ -42,9 +44,7 @@ class Example(QMainWindow):
         self.zoom_in_button.clicked.connect(self.zoom_in)
         self.zoom_label = QLabel("100%")
 
-
         self.zoom_slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
 
         self.zoom_controls_layout.addStretch()
         self.zoom_controls_layout.addWidget(self.zoom_out_button)
@@ -52,8 +52,6 @@ class Example(QMainWindow):
         self.zoom_controls_layout.addWidget(self.zoom_in_button)
         self.zoom_controls_layout.addWidget(self.zoom_label)
         self.zoom_controls_layout.addStretch()
-
-
         self.main_layout.addWidget(self.zoom_controls_widget)
 
 
@@ -64,7 +62,7 @@ class Example(QMainWindow):
         self.label = QLabel("No Event Log loaded")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         font = self.label.font()
-        font.setPointSize(100)  # Adjust the font size as needed
+        font.setPointSize(100)
         self.label.setFont(font)
         self.content_layout.addWidget(self.label)
 
@@ -207,7 +205,8 @@ class Example(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     example = Example()
-    app.exec()
+    example.show()
+    sys.exit(app.exec())
 
 if __name__ == '__main__':
     main()
