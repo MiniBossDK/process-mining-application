@@ -13,11 +13,6 @@ def save_gviz_as_svg(gviz, output_path):
     if os.path.exists(intermediate_file):
         os.remove(intermediate_file)
 
-def handle_load(path: str):
-    event_log = pm4py.read_xes(path)
-
-    graph, _ = pm4py.discover_dcr(event_log)
-
-    # Visualize the DCR graph
-    gviz = dcr_visualizer.apply(graph)
-    save_gviz_as_svg(gviz, 'output.svg')
+def handle_load(file_paths):
+    for file_path in file_paths:
+        event_log = pm4py.read_xes(file_path)
