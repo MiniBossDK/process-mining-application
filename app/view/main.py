@@ -2,13 +2,14 @@ import os
 import sys
 from PySide6.QtWidgets import (
     QMainWindow, QApplication, QLabel, QVBoxLayout, QWidget,
-    QMessageBox, QScrollArea, QSlider, QTableWidget, QTableWidgetItem,
+    QMessageBox, QScrollArea, QTableWidget, QTableWidgetItem,
     QPushButton, QHBoxLayout, QSizePolicy
 )
 from PySide6.QtGui import QPixmap, QImageReader, QPainter
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtSvg import QSvgRenderer
 from app.view.menu_bar import MenuBar
+from app.view.zoom_widget import ZoomWidget
 
 class Example(QMainWindow):
 
@@ -27,33 +28,9 @@ class Example(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.main_layout = QVBoxLayout(self.central_widget)
 
-
-        self.zoom_controls_layout = QHBoxLayout()
-        self.zoom_controls_widget = QWidget()
-        self.zoom_controls_widget.setLayout(self.zoom_controls_layout)
-        self.zoom_controls_widget.setVisible(False)
-
-        self.zoom_out_button = QPushButton("-")
-        self.zoom_out_button.clicked.connect(self.zoom_out)
-        self.zoom_slider = QSlider(Qt.Orientation.Horizontal)
-        self.zoom_slider.setMinimum(1)
-        self.zoom_slider.setMaximum(500)
-        self.zoom_slider.setValue(100)
-        self.zoom_slider.valueChanged.connect(self.zoom_image)
-        self.zoom_in_button = QPushButton("+")
-        self.zoom_in_button.clicked.connect(self.zoom_in)
-        self.zoom_label = QLabel("100%")
-
-        self.zoom_slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-
-        self.zoom_controls_layout.addStretch()
-        self.zoom_controls_layout.addWidget(self.zoom_out_button)
-        self.zoom_controls_layout.addWidget(self.zoom_slider)
-        self.zoom_controls_layout.addWidget(self.zoom_in_button)
-        self.zoom_controls_layout.addWidget(self.zoom_label)
-        self.zoom_controls_layout.addStretch()
-        self.main_layout.addWidget(self.zoom_controls_widget)
-
+        self.zoom_widget = ZoomWidget()
+        self.zoom_widget.setVisible(False)
+        self.main_layout.addWidget(self.zoom_widget)
 
         self.content_widget = QWidget()
         self.content_layout = QVBoxLayout()
@@ -71,7 +48,6 @@ class Example(QMainWindow):
         self.scroll_area.setWidgetResizable(True)
 
         self.main_layout.addWidget(self.scroll_area)
-
 
         self.bottom_layout = QHBoxLayout()
         self.main_layout.addLayout(self.bottom_layout)
@@ -98,7 +74,7 @@ class Example(QMainWindow):
             if widget is not None:
                 widget.deleteLater()
 
-        self.zoom_controls_widget.setVisible(False)
+        self.zoom_widget.setVisible(False)
 
         if self.image_label:
             self.image_label.deleteLater()
@@ -180,27 +156,10 @@ class Example(QMainWindow):
 
         self.content_layout.addWidget(self.image_label)
 
-        self.zoom_slider.setValue(100)
-        self.zoom_controls_widget.setVisible(True)
-
-    def zoom_in(self):
-        value = self.zoom_slider.value()
-        if value < self.zoom_slider.maximum():
-            self.zoom_slider.setValue(value + 10)
-
-    def zoom_out(self):
-        value = self.zoom_slider.value()
-        if value > self.zoom_slider.minimum():
-            self.zoom_slider.setValue(value - 10)
-    def zoom_image(self, value):
-        if hasattr(self, 'pixmap'):
-            scale_factor = value / 100.0
-            new_size = self.pixmap.size() * scale_factor
-            scaled_pixmap = self.pixmap.scaled(new_size, Qt.AspectRatioMode.KeepAspectRatio,
-                                               Qt.TransformationMode.SmoothTransformation)
-            self.image_label.setPixmap(scaled_pixmap)
-            self.image_label.resize(scaled_pixmap.size())
-            self.zoom_label.setText(f"{value}%")
+        self.zoom_widget.set_image_label(self.image_label)
+        self.zoom_widget.set_pixmap(self.pixmap)
+        self.zoom_widget.zoom_slider.setValue(100)
+        self.zoom_widget.setVisible(True)
 
 def main():
     app = QApplication(sys.argv)
