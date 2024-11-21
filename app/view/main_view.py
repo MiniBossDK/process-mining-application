@@ -21,16 +21,11 @@ class MainView(QMainWindow):
         main_layout = QHBoxLayout(container)
         splitter = QSplitter()
 
-
         main_layout.addWidget(splitter)
 
         self.layout = QHBoxLayout(container)
 
         self.event_log_model = EventLogModel()
-        self.event_log_model.add_event_log(EventLog("Hello1"))
-        self.event_log_model.add_event_log(EventLog("Hello2"))
-        self.event_log_model.add_event_log(EventLog("Hello3"))
-        self.event_log_model.add_event_log(EventLog("Hello4"))
 
         self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model)
         self.event_log_table_viewmodel = EventLogDataTableViewModel()
@@ -41,20 +36,19 @@ class MainView(QMainWindow):
         splitter.addWidget(self.event_log_list_view)
         self.layout.addWidget(self.event_log_list_view)
 
-
         self.event_log_list_view.setMinimumWidth(150)
 
         self.tab_widget = QTabWidget()
         splitter.addWidget(self.tab_widget)
 
-        self.event_log_table_viewmodel = EventLogDataTableViewModel()
         self.event_log_table_view = EventLogDataTableView(self.event_log_table_viewmodel)
-        self.graph_view = GraphView(file_path="", width=400, height=300)
+        self.graph_view = GraphView(width=400, height=300)
 
         self.tab_widget.addTab(self.event_log_table_view, "Table")
         self.tab_widget.addTab(self.graph_view, "Graph")
 
-        self.event_log_list_viewmodel.itemSelected.connect(self.event_log_table_viewmodel.on_item_selected)
+        self.event_log_list_view.itemSelected.connect(self.graph_view.update_graph)
+
         splitter.setSizes([150, 1000])
 
     def resize_window(self):
