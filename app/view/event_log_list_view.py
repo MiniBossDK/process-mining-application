@@ -1,6 +1,8 @@
 from pathlib import Path
 
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QListView
+
 
 import pm4py
 from app.model.eventlog import EventLog
@@ -8,6 +10,7 @@ from app.viewmodel.eventlog_list_viewmodel import EventLogListViewModel
 
 
 class EventLogListView(QWidget):
+
     def __init__(self, viewmodel: EventLogListViewModel):
         super().__init__()
 
@@ -47,4 +50,5 @@ class EventLogListView(QWidget):
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
         file_dialog.setNameFilter("All Event Log files (*.xes)")
         file_dialog.filesSelected.connect(self.add_event_log)
+        print("test")
         file_dialog.exec()
