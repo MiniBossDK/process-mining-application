@@ -16,7 +16,7 @@ class EventLogDataTableView(QWidget):
         viewmodel.itemSelected.connect(self.update_table_data)
 
     def update_table_data(self, event_log: EventLog):
-
+        '''
         self.table_view.setHorizontalHeaderLabels(event_log.data.keys())
         self.table_view.setColumnCount(len(event_log.data.columns))
         self.table_view.setRowCount(len(event_log.data.index))
@@ -26,3 +26,4 @@ class EventLogDataTableView(QWidget):
                 self.table_view.setItem(i, j, QTableWidgetItem(str(value)))
 
         self.table_view.setEnabled(True)
+        '''
