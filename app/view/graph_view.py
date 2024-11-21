@@ -1,23 +1,26 @@
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt
+
+from app.view.zoom_widget import ZoomWidget
 
 class GraphView(QWidget):
-    def __init__(self, file_path: str, width: int, height: int):
+    def __init__(self, file_path: str = "", width: int = 400, height: int = 300):
         super().__init__()
         self.file_path = file_path
-        self.width = width
-        self.height = height
 
         self.layout = QVBoxLayout(self)
-        self.label = QLabel()
-        self.layout.addWidget(self.label)
 
-        pixmap = QPixmap(self.file_path)
-        if not pixmap.isNull():
-            self.label.setPixmap(pixmap.scaled(self.width, self.height, Qt.KeepAspectRatio))
+        # Initialize ZoomWidget
+        self.zoom_widget = ZoomWidget()
+        self.layout.addWidget(self.zoom_widget)
+
+        # Load the pixmap
+        self.pixmap = QPixmap(self.file_path)
+        if not self.pixmap.isNull():
+            self.zoom_widget.set_pixmap(self.pixmap)
         else:
-            self.label.setText("No Graph Available")
+            self.zoom_widget.image_label.setText("No Graph Available")
 
     def render(self):
+        # Implement rendering logic if needed
         pass

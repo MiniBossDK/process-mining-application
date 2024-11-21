@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QSlider, QLabel, QSizePolicy
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLabel, QSizePolicy
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 
@@ -7,11 +7,18 @@ class ZoomWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.pixmap = None
-        self.image_label = None
+        self.image_label = QLabel()
         self.init_ui()
 
     def init_ui(self):
-        self.zoom_controls_layout = QHBoxLayout(self)
+        self.main_layout = QVBoxLayout(self)
+
+        # Image display
+        self.image_label.setAlignment(Qt.AlignCenter)
+        self.main_layout.addWidget(self.image_label)
+
+        # Zoom controls
+        self.zoom_controls_layout = QHBoxLayout()
         self.zoom_controls_layout.addStretch()
 
         self.zoom_out_button = QPushButton("-")
@@ -19,8 +26,8 @@ class ZoomWidget(QWidget):
         self.zoom_slider = QSlider(Qt.Orientation.Horizontal)
         self.zoom_label = QLabel("100%")
 
-        self.zoom_slider.setMinimum(1)
-        self.zoom_slider.setMaximum(500)
+        self.zoom_slider.setMinimum(10)
+        self.zoom_slider.setMaximum(300)
         self.zoom_slider.setValue(100)
         self.zoom_slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
@@ -30,15 +37,16 @@ class ZoomWidget(QWidget):
         self.zoom_controls_layout.addWidget(self.zoom_label)
         self.zoom_controls_layout.addStretch()
 
+        self.main_layout.addLayout(self.zoom_controls_layout)
+
         self.zoom_out_button.clicked.connect(self.zoom_out)
         self.zoom_in_button.clicked.connect(self.zoom_in)
         self.zoom_slider.valueChanged.connect(self.zoom_image)
 
     def set_pixmap(self, pixmap):
         self.pixmap = pixmap
-
-    def set_image_label(self, image_label):
-        self.image_label = image_label
+        # Initially display the image
+        self.zoom_image(self.zoom_slider.value())
 
     def zoom_in(self):
         value = self.zoom_slider.value()
@@ -51,7 +59,7 @@ class ZoomWidget(QWidget):
             self.zoom_slider.setValue(value - 10)
 
     def zoom_image(self, value):
-        if self.pixmap and self.image_label:
+        if self.pixmap:
             scale_factor = value / 100.0
             new_size = self.pixmap.size() * scale_factor
             scaled_pixmap = self.pixmap.scaled(
@@ -60,5 +68,4 @@ class ZoomWidget(QWidget):
                 Qt.TransformationMode.SmoothTransformation
             )
             self.image_label.setPixmap(scaled_pixmap)
-            self.image_label.resize(scaled_pixmap.size())
             self.zoom_label.setText(f"{value}%")
