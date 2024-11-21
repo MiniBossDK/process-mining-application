@@ -4,7 +4,6 @@ from pandas import DataFrame
 
 
 class EventLog:
-    def __init__(self, name: str, path: Path, data: DataFrame):
+    def __init__(self, name: str, data: DataFrame):
         self.name = name
-        self.path = path
         self.data = data

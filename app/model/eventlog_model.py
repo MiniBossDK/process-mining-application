@@ -1,28 +1,14 @@
-from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
-from pandas import DataFrame
+from typing import List
+
+from app.model.eventlog import EventLog
 
 
-class EventLog(QAbstractTableModel):
-    def __init__(self, eventlog: DataFrame):
-        super().__init__()
-        self.eventlog = eventlog
+class EventLogModel:
+    def __init__(self):
+        self._event_logs = []
 
-    def rowCount(self, parent=QModelIndex()):
-        return len(self.eventlog)
+    def add_event_log(self, event_log: EventLog):
+        self._event_logs.append(event_log)
 
-    def columnCount(self, parent=QModelIndex()):
-        return len(self.eventlog.columns)
-
-    def headerData(self, section, orientation, role = ...):
-        if role != Qt.ItemDataRole.DisplayRole:
-            return None
-
-        return self.eventlog.columns[section]
-
-    def data(self, index, role = ...):
-        if not index.isValid():
-            return None
-
-        if role == Qt.ItemDataRole.DisplayRole:
-            _, text = self.eventlog[index.row()]
-            return text
+    def get_event_logs(self) -> List[EventLog]:
+        return self._event_logs
