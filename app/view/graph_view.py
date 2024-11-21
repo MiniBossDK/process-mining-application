@@ -1,3 +1,4 @@
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtGui import QPixmap
 
@@ -16,6 +17,8 @@ class GraphView(QWidget):
 
         self.zoom_widget = ZoomWidget()
         self.layout.addWidget(self.zoom_widget)
+
+        self.zoom_widget.image_label.setAlignment(Qt.AlignCenter)
 
         self.pixmap = QPixmap(self.file_path)
         if not self.pixmap.isNull():

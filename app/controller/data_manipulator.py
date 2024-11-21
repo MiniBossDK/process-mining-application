@@ -11,8 +11,6 @@ class DataManipulator:
 
     def load_event_log(self, path: str):
         self.event_log = pm4py.read_xes(path)
-        print(path)
-        print("controllerwd")
         return self.event_log
 
 
