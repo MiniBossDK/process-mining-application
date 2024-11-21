@@ -4,14 +4,11 @@ from app.model.eventlog import EventLog
 
 
 class EventLogDataTableViewModel(QObject):
-    itemSelected = Signal()
+    itemSelected = Signal(EventLog)
 
     def __init__(self):
         super().__init__()
 
-
-
     def on_item_selected(self, eventlog: EventLog):
-
-        self.itemSelected.emit()
+        self.itemSelected.emit(eventlog)
 

@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QS
 
 import pm4py
 from app.model.eventlog import EventLog
+from app.model.eventlog_list_model import EventLogListModel
 from app.model.eventlog_model import EventLogModel
 from app.view.event_log_list_view import EventLogListView
 from app.view.eventlog_table_view import EventLogDataTableView
@@ -26,16 +27,14 @@ class MainView(QMainWindow):
 
         self.layout = QHBoxLayout(container)
 
-        self.event_log_model = EventLogModel()
-        self.event_log_model.add_event_log(EventLog("Hello1"))
-        self.event_log_model.add_event_log(EventLog("Hello2"))
-        self.event_log_model.add_event_log(EventLog("Hello3"))
-        self.event_log_model.add_event_log(EventLog("Hello4"))
+        self.event_log_model = EventLogListModel([])
 
+
+        # ViewModels
         self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model)
         self.event_log_table_viewmodel = EventLogDataTableViewModel()
 
-        self.event_log_list_viewmodel.itemSelected.connect(self.event_log_table_viewmodel.on_item_selected)
+        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.event_log_table_viewmodel.on_item_selected)
 
         self.event_log_list_view = EventLogListView(self.event_log_list_viewmodel)
         splitter.addWidget(self.event_log_list_view)
@@ -49,12 +48,13 @@ class MainView(QMainWindow):
 
         self.event_log_table_viewmodel = EventLogDataTableViewModel()
         self.event_log_table_view = EventLogDataTableView(self.event_log_table_viewmodel)
+
         self.graph_view = GraphView(file_path="", width=400, height=300)
 
         self.tab_widget.addTab(self.event_log_table_view, "Table")
         self.tab_widget.addTab(self.graph_view, "Graph")
 
-        self.event_log_list_viewmodel.itemSelected.connect(self.event_log_table_viewmodel.on_item_selected)
+        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.event_log_table_viewmodel.on_item_selected)
         splitter.setSizes([150, 1000])
 
     def resize_window(self):
