@@ -10,11 +10,11 @@ class GraphView(QWidget):
 
         self.layout = QVBoxLayout(self)
 
-        # Initialize ZoomWidget
+
         self.zoom_widget = ZoomWidget()
         self.layout.addWidget(self.zoom_widget)
 
-        # Load the pixmap
+
         self.pixmap = QPixmap(self.file_path)
         if not self.pixmap.isNull():
             self.zoom_widget.set_pixmap(self.pixmap)
@@ -22,5 +22,4 @@ class GraphView(QWidget):
             self.zoom_widget.image_label.setText("No Graph Available")
 
     def render(self):
-        # Implement rendering logic if needed
         pass

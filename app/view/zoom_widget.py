@@ -13,13 +13,12 @@ class ZoomWidget(QWidget):
     def init_ui(self):
         self.main_layout = QVBoxLayout(self)
 
-        # Image display
         self.image_label.setAlignment(Qt.AlignCenter)
         self.main_layout.addWidget(self.image_label)
 
-        # Zoom controls
+        self.main_layout.addStretch()
+
         self.zoom_controls_layout = QHBoxLayout()
-        self.zoom_controls_layout.addStretch()
 
         self.zoom_out_button = QPushButton("-")
         self.zoom_in_button = QPushButton("+")
@@ -31,12 +30,14 @@ class ZoomWidget(QWidget):
         self.zoom_slider.setValue(100)
         self.zoom_slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
 
+        self.zoom_controls_layout.addStretch()
         self.zoom_controls_layout.addWidget(self.zoom_out_button)
         self.zoom_controls_layout.addWidget(self.zoom_slider)
         self.zoom_controls_layout.addWidget(self.zoom_in_button)
         self.zoom_controls_layout.addWidget(self.zoom_label)
         self.zoom_controls_layout.addStretch()
 
+        # Add the zoom controls layout to the main layout
         self.main_layout.addLayout(self.zoom_controls_layout)
 
         self.zoom_out_button.clicked.connect(self.zoom_out)
@@ -45,7 +46,6 @@ class ZoomWidget(QWidget):
 
     def set_pixmap(self, pixmap):
         self.pixmap = pixmap
-        # Initially display the image
         self.zoom_image(self.zoom_slider.value())
 
     def zoom_in(self):
