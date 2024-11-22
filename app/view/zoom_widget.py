@@ -1,9 +1,9 @@
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLabel,
     QSizePolicy, QScrollArea
 )
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap
+
 
 class ZoomWidget(QWidget):
     def __init__(self, parent=None):
@@ -23,12 +23,12 @@ class ZoomWidget(QWidget):
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area.setAlignment(Qt.AlignCenter)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scroll_area.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
-        self.image_label.setAlignment(Qt.AlignTop | Qt.AlignLeft)
-        self.image_label.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        self.image_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
 
         self.scroll_area.setWidget(self.image_label)
 
@@ -46,7 +46,7 @@ class ZoomWidget(QWidget):
         self.zoom_slider.setMinimum(self.min_zoom)
         self.zoom_slider.setMaximum(self.max_zoom)
         self.zoom_slider.setValue(self.default_zoom)
-        self.zoom_slider.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.zoom_slider.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
         self.zoom_controls_layout.addStretch()
         self.zoom_controls_layout.addWidget(self.zoom_out_button)

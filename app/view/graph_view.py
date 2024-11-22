@@ -18,7 +18,7 @@ class GraphView(QWidget):
         self.zoom_widget = ZoomWidget()
         self.layout.addWidget(self.zoom_widget)
 
-        self.zoom_widget.image_label.setAlignment(Qt.AlignCenter)
+        self.zoom_widget.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.pixmap = QPixmap(self.file_path)
         if not self.pixmap.isNull():

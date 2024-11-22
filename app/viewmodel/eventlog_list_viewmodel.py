@@ -2,7 +2,6 @@ from PySide6.QtCore import QObject, Signal, Qt
 
 from app.model.eventlog import EventLog
 from app.model.eventlog_list_model import EventLogListModel
-from app.model.eventlog_model import EventLogModel
 
 
 class EventLogListViewModel(QObject):
