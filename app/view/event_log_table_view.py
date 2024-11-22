@@ -1,5 +1,5 @@
 import pandas as pd
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QTableView
 
 from app.model import EventLog
 from app.viewmodel import EventLogDataTableViewModel
@@ -12,6 +12,9 @@ class EventLogDataTableView(QWidget):
 
         self.layout = QVBoxLayout(self)
         self.table_view = QTableWidget()
+        # Disable for now until edit implementation is done
+        self.table_view.setEditTriggers(QTableView.EditTrigger.NoEditTriggers)
+
         self.layout.addWidget(self.table_view)
 
         self.viewmodel.itemSelected.connect(self.update_table_data)
