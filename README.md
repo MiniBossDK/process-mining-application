@@ -1,13 +1,17 @@
 # Process Mining Application
-This is a desktop application made for the software engineering course, 
-# How to set up the project
-Due to the project having a dependency on the [pm4py-dcr](https://github.com/paul-cvp/pm4py-dcr/tree/8ffdc7a3598ac8942d02ecb5802695ea7655eb60) 
-repository, you will need to add the ``--recursive`` option to the clone command to also clone that
-submodule:
+This is a desktop application made for the software engineering course, [02369 Software Processes and Patterns](https://kurser.dtu.dk/course/02369). 
+The desktop application makes use of [PySide6](https://doc.qt.io/qtforpython-6/) for the front-end and uses the [pm4py-dcr](https://github.com/paul-cvp/pm4py-dcr/tree/8ffdc7a3598ac8942d02ecb5802695ea7655eb60) 
+as a backend dependency for most of the process mining features.
+
+The goal of this application is to make process mining with pm4py-dcr more accessible for people
+without any programming experience. 
+## How to set up the project
+First clone the project:
 ```bash
 git clone https://github.com/MiniBossDK/process-mining-application.git
 ```
-Then, in the root of the cloned repository use the following command:
+Due to the project having a dependency on the [pm4py-dcr](https://github.com/paul-cvp/pm4py-dcr/tree/8ffdc7a3598ac8942d02ecb5802695ea7655eb60) 
+repository, you will also need to use the following command in the root of the cloned repository:
 ```bash
 git submodule update --init --recursive
 ```
@@ -51,7 +55,7 @@ pip install .
 ```
 Everything should now be set up, and you will now be able to run the application.
 
-# How to run the program
+## How to run the program
 To run the program, simply type the following command in the root of the project:
 ```bash
 python main.py
