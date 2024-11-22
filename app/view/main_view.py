@@ -1,12 +1,8 @@
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTabWidget
 
-from app.model.eventlog_list_model import EventLogListModel
-from app.view.event_log_list_view import EventLogListView
-from app.view.eventlog_table_view import EventLogDataTableView
-from app.view.graph_view import GraphView
-from app.viewmodel.eventlog_data_table_viewmodel import EventLogDataTableViewModel
-from app.viewmodel.eventlog_list_viewmodel import EventLogListViewModel
+from app.model import EventLogListModel
+from app.viewmodel import EventLogListViewModel, EventLogDataTableViewModel
 
 
 class MainView(QMainWindow):
@@ -31,6 +27,7 @@ class MainView(QMainWindow):
 
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.event_log_table_viewmodel.on_item_selected)
 
+        from app.view import EventLogListView
         self.event_log_list_view = EventLogListView(self.event_log_list_viewmodel)
         splitter.addWidget(self.event_log_list_view)
         self.layout.addWidget(self.event_log_list_view)
@@ -40,8 +37,9 @@ class MainView(QMainWindow):
         self.tab_widget = QTabWidget()
         splitter.addWidget(self.tab_widget)
 
+        from app.view import EventLogDataTableView
         self.event_log_table_view = EventLogDataTableView(self.event_log_table_viewmodel)
-
+        from app.view import GraphView
         self.graph_view = GraphView(file_path="", width=400, height=300)
 
 

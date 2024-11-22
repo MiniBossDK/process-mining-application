@@ -1,8 +1,9 @@
 import pandas as pd
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
 
-from app.model.eventlog import EventLog
-from app.viewmodel.eventlog_data_table_viewmodel import EventLogDataTableViewModel
+from app.model import EventLog
+from app.viewmodel import EventLogDataTableViewModel
+
 
 class EventLogDataTableView(QWidget):
     def __init__(self, viewmodel: EventLogDataTableViewModel):

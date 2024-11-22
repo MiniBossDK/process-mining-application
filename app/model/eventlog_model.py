@@ -1,6 +1,6 @@
 from typing import List
 
-from app.model.eventlog import EventLog
+from app.model import EventLog
 
 
 class EventLogModel:

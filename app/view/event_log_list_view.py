@@ -4,8 +4,8 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFileDi
 from lxml.etree import XMLSyntaxError
 
 import pm4py
-from app.model.eventlog import EventLog
-from app.viewmodel.eventlog_list_viewmodel import EventLogListViewModel
+from app.model import EventLog
+from app.viewmodel import EventLogListViewModel
 
 
 class EventLogListView(QWidget):

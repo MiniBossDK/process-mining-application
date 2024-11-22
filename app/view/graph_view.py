@@ -1,12 +1,13 @@
+import os
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtGui import QPixmap
 
 import pm4py
-from app.model.eventlog import EventLog
-from app.view.zoom_widget import ZoomWidget
 from pm4py.visualization.dcr import visualizer as dcr_visualizer
-import os
+from app.model import EventLog
+from app.view import ZoomWidget
 
 
 class GraphView(QWidget):

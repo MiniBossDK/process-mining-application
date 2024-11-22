@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
     QApplication
 )
 
-from app.view.main_view import MainView
+from app.view import MainView
 
 
 def main():

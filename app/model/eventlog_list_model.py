@@ -2,7 +2,7 @@ from typing import List
 
 from PySide6.QtCore import QAbstractListModel, Qt, QModelIndex
 
-from app.model.eventlog import EventLog
+from app.model import EventLog
 
 
 class EventLogListModel(QAbstractListModel):
