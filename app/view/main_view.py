@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTab
 
 from app.model import EventLogListModel
 from app.viewmodel import EventLogListViewModel, EventLogDataTableViewModel
+from app.viewmodel.conformence_checking_viewmodel import ConformanceCheckingViewModel
 
 
 class MainView(QMainWindow):
@@ -24,6 +25,7 @@ class MainView(QMainWindow):
         # ViewModels
         self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model)
         self.event_log_table_viewmodel = EventLogDataTableViewModel()
+        self.Conformance_checking_viewmodel = ConformanceCheckingViewModel()
 
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.event_log_table_viewmodel.on_item_selected)
 
@@ -51,6 +53,10 @@ class MainView(QMainWindow):
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.graph_view.update_graph)
 
         splitter.setSizes([150, 1000])
+
+        from app.view import ConformanceCheckingView
+        self.conformance_checking_view = ConformanceCheckingView(self.Conformance_checking_viewmodel)
+        main_layout.addWidget(self.conformance_checking_view)
 
     def resize_window(self):
         screen = QGuiApplication.primaryScreen().availableGeometry()
