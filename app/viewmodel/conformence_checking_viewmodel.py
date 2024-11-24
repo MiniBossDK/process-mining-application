@@ -1,6 +1,7 @@
 import pm4py
 from pm4py import conformance_dcr
 import pandas as pd
+from pm4py.visualization.petri_net.variants import alignments
 
 from app.model import EventLog
 
@@ -36,3 +37,8 @@ class ConformanceCheckingViewModel:
     def rule_conformance_checking(self):
         conformance_df = pd.DataFrame(conformance_dcr(self.active_event_log, self.dcr_graph))
         return conformance_df.to_string()
+
+    def alignment_conformance_checking(self):
+        # Perform alignment-based conformance checking
+        alignment_sepsis_df = pd.DataFrame(pm4py.optimal_alignment_dcr(self.active_event_log, self.dcr_graph))
+        return alignment_sepsis_df.to_string()

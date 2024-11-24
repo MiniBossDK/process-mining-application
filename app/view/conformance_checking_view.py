@@ -29,18 +29,25 @@ class ConformanceCheckingView(QWidget):
         msg_box.setText("Please choose a conformance checking method:")
         rule_button = msg_box.addButton("Rule Checking", QMessageBox.AcceptRole)
         alignment_button = msg_box.addButton("Alignment Checking", QMessageBox.AcceptRole)
+        msg_box.setStandardButtons(QMessageBox.Cancel)
+        msg_box.setDefaultButton(QMessageBox.Cancel)
         msg_box.exec()
+
+        if msg_box.result() == QMessageBox.Rejected:
+            return
 
         if msg_box.clickedButton() == rule_button:
             self.viewmodel.set_active_event_log(self.viewmodel.event_log)
             result = self.viewmodel.perform_rule_checking()
-            self.show_result(result)
+            self.show_result(result, "Rule Checking Result")
         elif msg_box.clickedButton() == alignment_button:
-            self.viewmodel.perform_alignment_checking()
+            self.viewmodel.set_active_event_log(self.viewmodel.event_log)
+            result = self.viewmodel.perform_alignment_checking()
+            self.show_result(result, "Alignment Checking Result")
 
-    def show_result(self, result):
+    def show_result(self, result, title):
         msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("rule Checking Result")
+        msg_box.setWindowTitle(title)
 
         scroll_area = QScrollArea(msg_box)
         scroll_area.setWidgetResizable(True)
@@ -52,12 +59,12 @@ class ConformanceCheckingView(QWidget):
         scroll_area.setWidget(content_widget)
 
         screen = QGuiApplication.primaryScreen().availableGeometry()
-        scroll_area.setFixedHeight(screen.height()-200)
+        scroll_area.setFixedHeight(screen.height() - 200)
         scroll_area.setFixedWidth(screen.width() // 2)
 
         msg_box.layout().addWidget(scroll_area)
 
-        msg_box.setMinimumHeight(screen.height()-200)
+        msg_box.setMinimumHeight(screen.height() - 200)
 
         msg_box.setMinimumWidth(screen.width() // 2)
 
