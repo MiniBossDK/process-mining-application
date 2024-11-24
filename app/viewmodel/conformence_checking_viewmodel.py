@@ -10,6 +10,7 @@ class ConformanceCheckingViewModel:
         self.dcr_graph = None
         self.event_log = None
         self.event_log_loaded = False
+        self.active_event_log = None
 
     def perform_rule_checking(self):
         # Implement the logic for rule-based conformance checking
@@ -27,9 +28,11 @@ class ConformanceCheckingViewModel:
     def set_event_log_loaded(self, loaded, event_log: EventLog):
         self.event_log_loaded = loaded
         self.event_log = event_log
-
         self.dcr_graph, _ = pm4py.discover_dcr(self.event_log)
 
+    def set_active_event_log(self, event_log: EventLog):
+        self.active_event_log = event_log
+
     def rule_conformance_checking(self):
-        conformance_df = pd.DataFrame(conformance_dcr(self.event_log, self.dcr_graph))
+        conformance_df = pd.DataFrame(conformance_dcr(self.active_event_log, self.dcr_graph))
         return conformance_df.to_string()
