@@ -1,7 +1,7 @@
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTabWidget
 
-from app.model import EventLogListModel
+from app.model import EventLogListModel, EventLog
 from app.viewmodel import EventLogListViewModel, EventLogDataTableViewModel
 from app.viewmodel.conformence_checking_viewmodel import ConformanceCheckingViewModel
 
@@ -51,6 +51,7 @@ class MainView(QMainWindow):
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.event_log_table_viewmodel.on_item_selected)
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.graph_view.update_graph)
 
+
         splitter.setSizes([150, 1000])
 
         from app.view import ConformanceCheckingView
@@ -61,6 +62,6 @@ class MainView(QMainWindow):
         screen = QGuiApplication.primaryScreen().availableGeometry()
         self.resize(int(screen.width() * 0.75), int(screen.height() * 0.75))
 
-    def on_event_log_loaded(self):
-        self.Conformance_checking_viewmodel.set_event_log_loaded(True)
+    def on_event_log_loaded(self,event_log: EventLog):
+        self.Conformance_checking_viewmodel.set_event_log_loaded(True, event_log.data)
         self.conformance_checking_view.update_button_state()

@@ -1,5 +1,6 @@
 # app/view/conformance_checking_view.py
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox, QScrollArea, QLabel
 
 
 class ConformanceCheckingView(QWidget):
@@ -31,6 +32,33 @@ class ConformanceCheckingView(QWidget):
         msg_box.exec()
 
         if msg_box.clickedButton() == rule_button:
-            self.viewmodel.perform_rule_checking()
+            result = self.viewmodel.perform_rule_checking()
+            self.show_result(result)
         elif msg_box.clickedButton() == alignment_button:
             self.viewmodel.perform_alignment_checking()
+
+    def show_result(self, result):
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("rule Checking Result")
+
+        scroll_area = QScrollArea(msg_box)
+        scroll_area.setWidgetResizable(True)
+
+        content_widget = QWidget()
+        content_layout = QVBoxLayout(content_widget)
+        content_label = QLabel(result)
+        content_layout.addWidget(content_label)
+        scroll_area.setWidget(content_widget)
+
+        screen = QGuiApplication.primaryScreen().availableGeometry()
+        scroll_area.setFixedHeight(screen.height()-200)
+        scroll_area.setFixedWidth(screen.width() // 2)
+
+        msg_box.layout().addWidget(scroll_area)
+
+        msg_box.setMinimumHeight(screen.height()-200)
+
+        msg_box.setMinimumWidth(screen.width() // 2)
+
+        #msg_box.setText(result)
+        msg_box.exec()
