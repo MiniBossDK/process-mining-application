@@ -37,6 +37,8 @@ class MainView(QMainWindow):
 
         self.event_log_list_viewmodel.event_log_added.connect(self.model_list_viewmodel.add_model)
 
+        self.model_list_viewmodel.selected_model_changed.connect((self.))
+
         from app.view import EventLogListView
         self.event_log_list_view = EventLogListView(self.event_log_list_viewmodel)
         from app.view import ModelListView
@@ -80,6 +82,7 @@ class MainView(QMainWindow):
 
     def on_event_log_loaded(self, event_log: EventLog):
         self.Conformance_checking_viewmodel.set_event_log_loaded(True, event_log.data)
+        self.Conformance_checking_viewmodel.set_model_log_loaded(True, model_log)
         self.conformance_checking_view.update_button_state()
 
     def display_result_in_tab(self, result_df, title):

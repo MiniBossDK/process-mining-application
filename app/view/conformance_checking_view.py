@@ -39,6 +39,7 @@ class ConformanceCheckingView(QWidget):
 
         if msg_box.clickedButton() == rule_button:
             self.viewmodel.set_active_event_log(self.viewmodel.event_log)
+            self.viewmodel.set_active_model_log(self.viewmodel.model_log)
             result = self.viewmodel.perform_rule_checking()
             self.main_view.display_result_in_tab(result, "Rule Checking Result")
         elif msg_box.clickedButton() == alignment_button:
