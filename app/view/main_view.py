@@ -2,8 +2,10 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTabWidget
 
 from app.model import EventLogListModel, EventLog
+from app.model.model_list import ModelList
 from app.viewmodel import EventLogListViewModel, EventLogDataTableViewModel
 from app.viewmodel.conformence_checking_viewmodel import ConformanceCheckingViewModel
+from app.viewmodel.model_list_viewmodel import ModelListViewModel
 
 
 class MainView(QMainWindow):
@@ -21,20 +23,30 @@ class MainView(QMainWindow):
         self.layout = QHBoxLayout(container)
 
         self.event_log_model = EventLogListModel([])
+        self.model_list = ModelList([])
 
         # ViewModels
-        self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model)
+        self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model, self.model_list)
         self.event_log_table_viewmodel = EventLogDataTableViewModel()
         self.Conformance_checking_viewmodel = ConformanceCheckingViewModel()
+        self.model_list_viewmodel = ModelListViewModel(self.model_list)
 
         self.event_log_list_viewmodel.selected_event_log_changed.connect(
             self.event_log_table_viewmodel.on_item_selected)
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.on_event_log_loaded)
 
+        self.event_log_list_viewmodel.event_log_added.connect(self.model_list_viewmodel.add_model)
+
         from app.view import EventLogListView
         self.event_log_list_view = EventLogListView(self.event_log_list_viewmodel)
+        from app.view import ModelListView
+        self.model_list_view = ModelListView(self.model_list_viewmodel)
+
         splitter.addWidget(self.event_log_list_view)
+        splitter.addWidget(self.model_list_view)
+
         self.layout.addWidget(self.event_log_list_view)
+        self.layout.addWidget(self.model_list_view)
 
         self.event_log_list_view.setMinimumWidth(150)
 
