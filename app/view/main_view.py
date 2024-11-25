@@ -27,7 +27,8 @@ class MainView(QMainWindow):
         self.event_log_table_viewmodel = EventLogDataTableViewModel()
         self.Conformance_checking_viewmodel = ConformanceCheckingViewModel()
 
-        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.event_log_table_viewmodel.on_item_selected)
+        self.event_log_list_viewmodel.selected_event_log_changed.connect(
+            self.event_log_table_viewmodel.on_item_selected)
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.on_event_log_loaded)
 
         from app.view import EventLogListView
@@ -48,20 +49,28 @@ class MainView(QMainWindow):
         self.tab_widget.addTab(self.event_log_table_view, "Table")
         self.tab_widget.addTab(self.graph_view, "Graph")
 
-        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.event_log_table_viewmodel.on_item_selected)
-        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.graph_view.update_graph)
+        self.result_tab_widget = QTabWidget()
+        self.tab_widget.addTab(self.result_tab_widget, "Conformance Check Result")
 
+        self.event_log_list_viewmodel.selected_event_log_changed.connect(
+            self.event_log_table_viewmodel.on_item_selected)
+        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.graph_view.update_graph)
 
         splitter.setSizes([150, 1000])
 
         from app.view import ConformanceCheckingView
-        self.conformance_checking_view = ConformanceCheckingView(self.Conformance_checking_viewmodel)
+        self.conformance_checking_view = ConformanceCheckingView(self.Conformance_checking_viewmodel, self)
         main_layout.addWidget(self.conformance_checking_view)
 
     def resize_window(self):
         screen = QGuiApplication.primaryScreen().availableGeometry()
         self.resize(int(screen.width() * 0.75), int(screen.height() * 0.75))
 
-    def on_event_log_loaded(self,event_log: EventLog):
+    def on_event_log_loaded(self, event_log: EventLog):
         self.Conformance_checking_viewmodel.set_event_log_loaded(True, event_log.data)
         self.conformance_checking_view.update_button_state()
+
+    def display_result_in_tab(self, result_df, title):
+        result_widget = self.Conformance_checking_viewmodel.create_result_widget(result_df)
+        self.result_tab_widget.addTab(result_widget, title)
+        self.result_tab_widget.setCurrentWidget(result_widget)
