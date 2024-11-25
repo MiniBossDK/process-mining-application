@@ -7,6 +7,8 @@ from app.model.model import Model
 from app.model.model_list import ModelList
 
 
+
+
 class ModelListViewModel(QObject):
     selected_model_changed = Signal(Model)
 
@@ -35,3 +37,5 @@ class ModelListViewModel(QObject):
         except Exception:
             return
         self._model.add_model(Model(event_log.name, model))
+
+

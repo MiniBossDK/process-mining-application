@@ -1,7 +1,7 @@
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTabWidget
 
-from app.model import EventLogListModel, EventLog
+from app.model import EventLogListModel, EventLog, Model
 from app.model.model_list import ModelList
 from app.viewmodel import EventLogListViewModel, EventLogDataTableViewModel
 from app.viewmodel.conformence_checking_viewmodel import ConformanceCheckingViewModel
@@ -34,10 +34,11 @@ class MainView(QMainWindow):
         self.event_log_list_viewmodel.selected_event_log_changed.connect(
             self.event_log_table_viewmodel.on_item_selected)
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.on_event_log_loaded)
+        self.model_list_viewmodel.selected_model_changed.connect(self.on_model_log_loaded)
 
         self.event_log_list_viewmodel.event_log_added.connect(self.model_list_viewmodel.add_model)
 
-        self.model_list_viewmodel.selected_model_changed.connect((self.))
+
 
         from app.view import EventLogListView
         self.event_log_list_view = EventLogListView(self.event_log_list_viewmodel)
@@ -82,7 +83,10 @@ class MainView(QMainWindow):
 
     def on_event_log_loaded(self, event_log: EventLog):
         self.Conformance_checking_viewmodel.set_event_log_loaded(True, event_log.data)
-        self.Conformance_checking_viewmodel.set_model_log_loaded(True, model_log)
+        self.conformance_checking_view.update_button_state()
+
+    def on_model_log_loaded(self, model_log: Model):
+        self.Conformance_checking_viewmodel.set_model_log_loaded(True, model_log.model)
         self.conformance_checking_view.update_button_state()
 
     def display_result_in_tab(self, result_df, title):
