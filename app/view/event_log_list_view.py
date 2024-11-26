@@ -33,14 +33,18 @@ class EventLogListView(QWidget):
         selection_model.connect(self.event_log_selected)
 
     def add_event_log(self, event_log_file_paths):
+        failed_event_log_names = []
         for str_path in event_log_file_paths:
             path = Path(str_path)
             try:
                 event_log = EventLog(path.name, pm4py.read_xes(str_path))
             except XMLSyntaxError:
-                QMessageBox.critical(self, "File loading error", "The file " + path.name + " could not be read.")
+                failed_event_log_names.append(path.name)
                 continue
             self.viewmodel.add_event_log(event_log)
+        if len(failed_event_log_names) > 0:
+            QMessageBox.critical(self, "File loading error", "The file following files could not be loaded:\n"
+                                 + '\n'.join(failed_event_log_names))
 
     def event_log_selected(self, selected, deselected):
         indexes = selected.indexes()
