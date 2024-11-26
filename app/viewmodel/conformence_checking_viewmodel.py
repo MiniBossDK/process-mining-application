@@ -70,7 +70,7 @@ class ConformanceCheckingViewModel:
         #alignment_sepsis_df = pd.DataFrame(pm4py.optimal_alignment_dcr(self.active_event_log, self.dcr_graph, return_diagnostics_dataframe=True))
         alignment_sepsis_df = pm4py.optimal_alignment_dcr(self.active_event_log, self.event_dcr_graph,
                                                           return_diagnostics_dataframe=True)
-        return alignment_sepsis_df.to_string()
+        return alignment_sepsis_df
 
     def create_result_widget(self, result):
         # Create a widget to display the result

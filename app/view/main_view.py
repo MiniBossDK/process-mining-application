@@ -1,5 +1,6 @@
+# main_view.py
 from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTabWidget
+from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTabWidget, QMessageBox
 
 from app.model import EventLogListModel, EventLog, Model
 from app.model.model_list import ModelList
@@ -38,8 +39,6 @@ class MainView(QMainWindow):
 
         self.event_log_list_viewmodel.event_log_added.connect(self.model_list_viewmodel.add_model)
 
-
-
         from app.view import EventLogListView
         self.event_log_list_view = EventLogListView(self.event_log_list_viewmodel)
         from app.view import ModelListView
@@ -65,13 +64,15 @@ class MainView(QMainWindow):
         self.tab_widget.addTab(self.graph_view, "Graph")
 
         self.result_tab_widget = QTabWidget()
+        self.result_tab_widget.setTabsClosable(True)  # Enable closable tabs
+        self.result_tab_widget.tabCloseRequested.connect(self.close_result_tab)  # Connect the close signal
         self.tab_widget.addTab(self.result_tab_widget, "Conformance Check Result")
 
         self.event_log_list_viewmodel.selected_event_log_changed.connect(
             self.event_log_table_viewmodel.on_item_selected)
         self.event_log_list_viewmodel.selected_event_log_changed.connect(self.graph_view.update_graph)
 
-        splitter.setSizes([150, 1000])
+        splitter.setSizes([150, 150, 1000])
 
         from app.view import ConformanceCheckingView
         self.conformance_checking_view = ConformanceCheckingView(self.Conformance_checking_viewmodel, self)
@@ -90,6 +91,32 @@ class MainView(QMainWindow):
         self.conformance_checking_view.update_button_state()
 
     def display_result_in_tab(self, result_df, title):
+        # Check if the tab already exists to prevent duplicates
+        for index in range(self.result_tab_widget.count()):
+            if self.result_tab_widget.tabText(index) == title:
+                self.result_tab_widget.setCurrentIndex(index)
+                return
+
         result_widget = self.Conformance_checking_viewmodel.create_result_widget(result_df)
         self.result_tab_widget.addTab(result_widget, title)
         self.result_tab_widget.setCurrentWidget(result_widget)
+
+    def close_result_tab(self, index):
+        tab_title = self.result_tab_widget.tabText(index)
+        if tab_title in ["Rule Checking Result", "Alignment Checking Result"]:
+            confirm = QMessageBox.question(
+                self,
+                "Close Tab",
+                f"Are you sure you want to close the '{tab_title}' tab?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+            if confirm == QMessageBox.Yes:
+                self.result_tab_widget.removeTab(index)
+        else:
+            # Optionally, prevent closing other tabs or handle differently
+            QMessageBox.information(
+                self,
+                "Cannot Close Tab",
+                "This tab cannot be closed."
+            )
