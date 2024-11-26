@@ -60,3 +60,10 @@ To run the program, simply type the following command in the root of the project
 ```bash
 python main.py
 ```
+
+## How to run tests
+To run the cucumber tests run the following command in the root of the
+project after the installation of the required packages:
+```bash
+behave
+```
