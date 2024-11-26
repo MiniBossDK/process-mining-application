@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTab
 
 from app.model import EventLogListModel, EventLog, Model
 from app.model.model_list import ModelList
+from app.view.alignment_view import AlignmentView
 from app.viewmodel import EventLogListViewModel, EventLogDataTableViewModel
 from app.viewmodel.conformence_checking_viewmodel import ConformanceCheckingViewModel
 from app.viewmodel.model_list_viewmodel import ModelListViewModel
@@ -83,11 +84,11 @@ class MainView(QMainWindow):
         self.resize(int(screen.width() * 0.75), int(screen.height() * 0.75))
 
     def on_event_log_loaded(self, event_log: EventLog):
-        self.Conformance_checking_viewmodel.set_event_log_loaded(True, event_log.data)
+        self.Conformance_checking_viewmodel.set_event_log_loaded(True, event_log)
         self.conformance_checking_view.update_button_state()
 
     def on_model_log_loaded(self, model_log: Model):
-        self.Conformance_checking_viewmodel.set_model_log_loaded(True, model_log.model)
+        self.Conformance_checking_viewmodel.set_model_log_loaded(True, model_log)
         self.conformance_checking_view.update_button_state()
 
     def display_result_in_tab(self, result_df, title):
@@ -101,6 +102,11 @@ class MainView(QMainWindow):
         self.result_tab_widget.addTab(result_widget, title)
         self.result_tab_widget.setCurrentWidget(result_widget)
 
+    def display_alignment_in_tab(self):
+        alignment_view = AlignmentView("alignment_output.svg")
+        self.result_tab_widget.addTab(alignment_view, "Test")
+        self.result_tab_widget.setCurrentWidget(alignment_view)
+
     def close_result_tab(self, index):
         tab_title = self.result_tab_widget.tabText(index)
         if tab_title in ["Rule Checking Result", "Alignment Checking Result"]:
@@ -108,10 +114,10 @@ class MainView(QMainWindow):
                 self,
                 "Close Tab",
                 f"Are you sure you want to close the '{tab_title}' tab?",
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No
             )
-            if confirm == QMessageBox.Yes:
+            if confirm == QMessageBox.StandardButton.Yes:
                 self.result_tab_widget.removeTab(index)
         else:
             # Optionally, prevent closing other tabs or handle differently

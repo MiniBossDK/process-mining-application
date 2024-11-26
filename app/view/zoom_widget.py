@@ -1,4 +1,6 @@
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
+from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLabel,
     QSizePolicy, QScrollArea
@@ -6,10 +8,12 @@ from PySide6.QtWidgets import (
 
 
 class ZoomWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, is_svg: bool, parent=None):
         super().__init__(parent)
-        self.pixmap = None
+        self.is_svg = is_svg
+        self.pixmap: QPixmap = None
         self.image_label = QLabel()
+        self.svg_widget = QSvgWidget()
         self.min_zoom = 10
         self.max_zoom = 300
         self.zoom_step = 10
@@ -27,10 +31,14 @@ class ZoomWidget(QWidget):
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
+        #self.svg_widget.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.image_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
 
-        self.scroll_area.setWidget(self.image_label)
+        if self.is_svg:
+            self.scroll_area.setWidget(self.svg_widget)
+        else:
+            self.scroll_area.setWidget(self.image_label)
 
         self.main_layout.addWidget(self.scroll_area)
 
@@ -64,6 +72,10 @@ class ZoomWidget(QWidget):
     def set_pixmap(self, pixmap):
         self.pixmap = pixmap
         self.zoom_image(self.zoom_slider.value())
+
+    def set_svg(self, path: str):
+        self.svg_widget.load(path)
+        self.svg_widget.setFixedHeight(int(self.height() / 2))
 
     def zoom_in(self):
         value = min(self.zoom_slider.value() + self.zoom_step, self.max_zoom)

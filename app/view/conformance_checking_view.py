@@ -28,13 +28,14 @@ class ConformanceCheckingView(QWidget):
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("Choose Conformance Checking Method")
         msg_box.setText("Please choose a conformance checking method:")
-        rule_button = msg_box.addButton("Rule Checking", QMessageBox.AcceptRole)
-        alignment_button = msg_box.addButton("Alignment Checking", QMessageBox.AcceptRole)
-        msg_box.setStandardButtons(QMessageBox.Cancel)
-        msg_box.setDefaultButton(QMessageBox.Cancel)
+        rule_button = msg_box.addButton("Rule Checking", QMessageBox.ButtonRole.AcceptRole)
+        alignment_button = msg_box.addButton("Alignment Checking", QMessageBox.ButtonRole.AcceptRole)
+        #msg_box.setStandardButtons(QMessageBox.StandardButton.Cancel)
+        #msg_box.setDefaultButton(QMessageBox.StandardButton.Cancel)
         msg_box.exec()
 
-        if msg_box.result() == QMessageBox.Rejected:
+        if msg_box.result() == QMessageBox.DialogCode.Rejected:
+            msg_box.close()
             return
 
         self.viewmodel.set_active_event_log(self.viewmodel.event_log)
@@ -44,8 +45,8 @@ class ConformanceCheckingView(QWidget):
             result = self.viewmodel.perform_rule_checking()
             self.main_view.display_result_in_tab(result, "Rule Checking Result")
         elif msg_box.clickedButton() == alignment_button:
-            result = self.viewmodel.perform_alignment_checking()
-            self.main_view.display_result_in_tab(result, "Alignment Checking Result")
+            self.viewmodel.perform_alignment_checking()
+            self.main_view.display_alignment_in_tab()
 
     def show_result(self, result, title):
         msg_box = QMessageBox(self)

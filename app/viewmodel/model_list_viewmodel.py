@@ -29,15 +29,14 @@ class ModelListViewModel(QObject):
         if index.isValid():
             self._selected_model = self._model.data(index, Qt.ItemDataRole.UserRole)
             self.selected_model_changed.emit(self._selected_model)
-            print(self._selected_model.name)
 
     def add_model(self, event_log: EventLog):
         try:
             #TODO
             print("hard coded value, fix for later")
-            model, _ = pm4py.discover_dcr(event_log.data, post_process={'roles'}, group_key="org:resource")
+            model, _ = pm4py.discover_dcr(event_log.data)
         except Exception:
             return
-        self._model.add_model(Model(event_log.name, model))
+        self._model.add_model(Model(event_log.name, model, event_log))
 
 
