@@ -18,3 +18,4 @@ def user_selected_event_log(context):
 def verify_loaded_event_log(context):
     event_log_name = context.event_log_model.data(QModelIndex(), Qt.ItemDataRole.DisplayRole)
     assert event_log_name == "running-example.xes"
+
