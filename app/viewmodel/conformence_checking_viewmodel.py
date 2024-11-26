@@ -60,7 +60,9 @@ class ConformanceCheckingViewModel:
         print(self.model_dcr_graph)
 
 
-        conformance_df = conformance_dcr(self.active_event_log, self.model_dcr_graph, return_diagnostics_dataframe=True)
+        conformance_df = conformance_dcr(self.active_event_log, self.model_dcr_graph,group_key="org:resource", return_diagnostics_dataframe=True)
+
+        print(conformance_df)
         return conformance_df
 
     def alignment_conformance_checking(self):
@@ -82,7 +84,10 @@ class ConformanceCheckingViewModel:
 
         for i in range(result.shape[0]):
             for j in range(result.shape[1]):
-                table_widget.setItem(i, j, QTableWidgetItem(str(result.iat[i, j])))
+                value = result.iat[i, j]
+                if isinstance(value,(int,float)):
+                    value = f"{value:.6g}"
+                table_widget.setItem(i, j, QTableWidgetItem(str(value)))
 
         layout.addWidget(table_widget)
         return result_widget

@@ -33,7 +33,9 @@ class ModelListViewModel(QObject):
 
     def add_model(self, event_log: EventLog):
         try:
-            model, _ = pm4py.discover_dcr(event_log.data)
+            #TODO
+            print("hard coded value, fix for later")
+            model, _ = pm4py.discover_dcr(event_log.data, post_process={'roles'}, group_key="org:resource")
         except Exception:
             return
         self._model.add_model(Model(event_log.name, model))
