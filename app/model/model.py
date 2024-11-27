@@ -1,11 +1,7 @@
-from pandas import DataFrame
-
-from app.model import EventLog
-from pm4py import DcrGraph
+from typing import Any
 
 
 class Model:
-    def __init__(self, name: str, model: DataFrame, event_log: EventLog):
+    def __init__(self, name: str, model: Any):
         self.name = name
         self.model = model
-        self.event_log = event_log

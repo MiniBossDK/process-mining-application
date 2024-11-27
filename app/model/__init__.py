@@ -2,7 +2,7 @@
 
 from .eventlog import EventLog
 from .eventlog_model import EventLogModel
-from .eventlog_list_model import EventLogListModel
+from app.model.repositories.eventlog_repository import EventLogRepository
 from .model import Model
 
-__all__ = ["EventLog", "EventLogModel", "EventLogListModel", "Model"]
+__all__ = ["EventLog", "EventLogModel", "EventLogRepository", "Model"]

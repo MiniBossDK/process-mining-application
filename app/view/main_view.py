@@ -2,10 +2,11 @@
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QSplitter, QTabWidget, QMessageBox
 
-from app.model import EventLogListModel, EventLog, Model
-from app.model.model_list import ModelList
+from app.model import EventLogRepository, EventLog, Model
+from app.model.repositories.model_repository import ModelRepository
+from app.view.tabs_view import TabsView
 from app.view.alignment_view import AlignmentView
-from app.viewmodel import EventLogListViewModel, EventLogDataTableViewModel
+from app.viewmodel import EventLogListViewModel
 from app.viewmodel.conformence_checking_viewmodel import ConformanceCheckingViewModel
 from app.viewmodel.model_list_viewmodel import ModelListViewModel
 
@@ -22,23 +23,13 @@ class MainView(QMainWindow):
 
         main_layout.addWidget(splitter)
 
-        self.layout = QHBoxLayout(container)
-
-        self.event_log_model = EventLogListModel([])
-        self.model_list = ModelList([])
+        self.event_log_model = EventLogRepository()
+        self.model_list = ModelRepository()
 
         # ViewModels
-        self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model, self.model_list)
-        self.event_log_table_viewmodel = EventLogDataTableViewModel()
-        self.Conformance_checking_viewmodel = ConformanceCheckingViewModel()
+        self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model)
+        #self.conformance_checking_viewmodel = ConformanceCheckingViewModel(self.event_log_model, self.model_list)
         self.model_list_viewmodel = ModelListViewModel(self.model_list)
-
-        self.event_log_list_viewmodel.selected_event_log_changed.connect(
-            self.event_log_table_viewmodel.on_item_selected)
-        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.on_event_log_loaded)
-        self.model_list_viewmodel.selected_model_changed.connect(self.on_model_log_loaded)
-
-        self.event_log_list_viewmodel.event_log_added.connect(self.model_list_viewmodel.add_model)
 
         from app.view import EventLogListView
         self.event_log_list_view = EventLogListView(self.event_log_list_viewmodel)
@@ -48,36 +39,24 @@ class MainView(QMainWindow):
         splitter.addWidget(self.event_log_list_view)
         splitter.addWidget(self.model_list_view)
 
-        self.layout.addWidget(self.event_log_list_view)
-        self.layout.addWidget(self.model_list_view)
-
         self.event_log_list_view.setMinimumWidth(150)
-
-        self.tab_widget = QTabWidget()
-        splitter.addWidget(self.tab_widget)
+        self.model_list_view.setMinimumWidth(150)
 
         from app.view import EventLogDataTableView
-        self.event_log_table_view = EventLogDataTableView(self.event_log_table_viewmodel)
+        self.event_log_table_view = EventLogDataTableView(self.event_log_list_viewmodel)
         from app.view import GraphView
-        self.graph_view = GraphView(file_path="", width=400, height=300)
-
-        self.tab_widget.addTab(self.event_log_table_view, "Table")
-        self.tab_widget.addTab(self.graph_view, "Graph")
-
-        self.result_tab_widget = QTabWidget()
-        self.result_tab_widget.setTabsClosable(True)  # Enable closable tabs
-        self.result_tab_widget.tabCloseRequested.connect(self.close_result_tab)  # Connect the close signal
-        self.tab_widget.addTab(self.result_tab_widget, "Conformance Check Result")
-
-        self.event_log_list_viewmodel.selected_event_log_changed.connect(
-            self.event_log_table_viewmodel.on_item_selected)
-        self.event_log_list_viewmodel.selected_event_log_changed.connect(self.graph_view.update_graph)
-
-        splitter.setSizes([150, 150, 1000])
-
+        self.graph_view = GraphView(self.event_log_list_viewmodel)
         from app.view import ConformanceCheckingView
-        self.conformance_checking_view = ConformanceCheckingView(self.Conformance_checking_viewmodel, self)
-        main_layout.addWidget(self.conformance_checking_view)
+        self.conformance_checking_view = ConformanceCheckingView(self.event_log_list_viewmodel,
+                                                                 self.model_list_viewmodel)
+
+        self.tab_widget = TabsView([self.event_log_table_view, self.graph_view, self.conformance_checking_view])
+
+        splitter.addWidget(self.tab_widget)
+
+        splitter.setSizes([150, 150, 300])
+
+
 
     def resize_window(self):
         screen = QGuiApplication.primaryScreen().availableGeometry()
@@ -104,7 +83,7 @@ class MainView(QMainWindow):
 
     def display_alignment_in_tab(self):
         alignment_view = AlignmentView("alignment_output.svg")
-        self.result_tab_widget.addTab(alignment_view, "Test")
+        self.result_tab_widget.addTab(alignment_view, "Alignment Checking Result")
         self.result_tab_widget.setCurrentWidget(alignment_view)
 
     def close_result_tab(self, index):

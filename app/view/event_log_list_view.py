@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QListView, QMessageBox
-from lxml.etree import XMLSyntaxError
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QListView, QMessageBox, \
+    QListWidget, QListWidgetItem
 
 import pm4py
 from app.model import EventLog
@@ -20,32 +21,38 @@ class EventLogListView(QWidget):
         self.list_label = QLabel("Event Logs")
         self.layout.addWidget(self.list_label)
 
-        self.list_widget = QListView()
+        self.list_widget = QListWidget()
         self.layout.addWidget(self.list_widget)
 
         self.add_button = QPushButton("Add Event Logs")
         self.add_button.clicked.connect(self.open_file_dialog)
         self.layout.addWidget(self.add_button)
 
-        self.list_widget.setModel(self.viewmodel.model)
+        self.list_widget.itemClicked.connect(self.event_log_selected)
+        self.viewmodel.event_log_added.connect(self.on_event_log_add)
 
-        selection_model = self.list_widget.selectionModel().selectionChanged
-        selection_model.connect(self.event_log_selected)
+        # Make sure the user can only select one item
+        self.list_widget.setSelectionMode(QListView.SelectionMode.SingleSelection)
+
+    def on_event_log_add(self, event_log: EventLog):
+        item = QListWidgetItem(event_log.name)
+        item.setData(Qt.ItemDataRole.UserRole, event_log)
+        self.list_widget.addItem(item)
 
     def add_event_log(self, event_log_file_paths):
+        failed_event_logs = []
         for str_path in event_log_file_paths:
             path = Path(str_path)
             try:
-                event_log = EventLog(path.name, pm4py.read_xes(str_path))
-            except XMLSyntaxError:
-                QMessageBox.critical(self, "File loading error", "The file " + path.name + " could not be read.")
+                event_log = EventLog(path.name, pm4py.read_xes(str_path), False)
+            except Exception:
                 continue
             self.viewmodel.add_event_log(event_log)
+        if len(failed_event_logs) > 0:  (
+            QMessageBox.critical(self, "File loading error", "The following files could not be loaded:\n" + "\n".join(failed_event_logs)))
 
-    def event_log_selected(self, selected, deselected):
-        indexes = selected.indexes()
-        if indexes:
-            self.viewmodel.set_selected_event_log(indexes[0])
+    def event_log_selected(self, item: QListWidgetItem):
+        self.viewmodel.set_selected_event_log(item.data(Qt.ItemDataRole.UserRole))
 
     def open_file_dialog(self):
         file_dialog = QFileDialog(self)

@@ -1,42 +1,21 @@
-from PySide6.QtCore import QObject, Signal, Qt
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtCore import QObject, Signal
 
-import pm4py
-from app.model import EventLog, EventLogListModel
 from app.model.model import Model
-from app.model.model_list import ModelList
-
-
+from app.model.repositories.model_repository import ModelRepository
 
 
 class ModelListViewModel(QObject):
     selected_model_changed = Signal(Model)
+    model_added = Signal(Model)
 
-    def __init__(self, model: ModelList):
+    def __init__(self, model: ModelRepository):
         super().__init__()
         self._model = model
-        self._selected_model = None
 
-    @property
-    def model(self):
-        return self._model
+    def add_model(self, model: Model):
+        self._model.add_model(model)
+        self.model_added.emit(model)
 
-    @property
-    def selected_event_log(self):
-        return self._selected_model
-
-    def set_selected_model(self, index):
-        if index.isValid():
-            self._selected_model = self._model.data(index, Qt.ItemDataRole.UserRole)
-            self.selected_model_changed.emit(self._selected_model)
-
-    def add_model(self, event_log: EventLog):
-        try:
-            #TODO
-            print("hard coded value, fix for later")
-            model, _ = pm4py.discover_dcr(event_log.data)
-        except Exception:
-            return
-        self._model.add_model(Model(event_log.name, model, event_log))
-
-
+    def set_selected_model(self, model: Model):
+        self._model.selected_model = model
+        self.selected_model_changed.emit(model)

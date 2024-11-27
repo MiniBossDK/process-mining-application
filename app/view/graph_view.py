@@ -5,27 +5,34 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtGui import QPixmap
 
 import pm4py
+from app.view.tabable_view import TabableView
+from app.viewmodel import EventLogListViewModel
 from pm4py.visualization.dcr import visualizer as dcr_visualizer
 from app.model import EventLog
 from app.view import ZoomWidget
 
 
-class GraphView(QWidget):
-    def __init__(self, file_path: str = "", width: int = 400, height: int = 300):
+class GraphView(QWidget, TabableView):
+
+    def closeable(self):
+        return False
+
+    def tab_name(self):
+        return "Graph"
+
+    def __init__(self, event_log_list_viewmodel: EventLogListViewModel):
         super().__init__()
-        self.file_path = file_path
         self.layout = QVBoxLayout(self)
+        self._event_log_list_viewmodel = event_log_list_viewmodel
 
         self.zoom_widget = ZoomWidget(False)
         self.layout.addWidget(self.zoom_widget)
 
         self.zoom_widget.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.pixmap = QPixmap(self.file_path)
-        if not self.pixmap.isNull():
-            self.zoom_widget.set_pixmap(self.pixmap)
-        else:
-            self.zoom_widget.image_label.setText("No Graph Available")
+        self._event_log_list_viewmodel.selected_event_log_changed.connect(self.update_graph)
+
+        self.zoom_widget.image_label.setText("No Graph Available")
 
     def update_graph(self, event_log: EventLog):
         try:

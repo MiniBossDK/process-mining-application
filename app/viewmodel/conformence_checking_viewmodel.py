@@ -1,37 +1,26 @@
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem
 
 import pm4py
-from app.model import EventLog, Model
-from pm4py import conformance_dcr, DcrGraph
+from app.model import EventLog, Model, EventLogRepository
+from app.model.repositories.model_repository import ModelRepository
+from pm4py import conformance_dcr
 
 
-class ConformanceCheckingViewModel:
-    def __init__(self):
-        self.event_dcr_graph = None
-        self.model_dcr_graph = None
-        self.event_log = None
-        self.model_log = None
-        self.event_log_loaded = False
-        self.model_log_loaded = False
-        self.active_event_log = None
-        self.active_model_log = None
+class ConformanceCheckingViewModel(QObject):
+
+    def __init__(self, event_log: EventLogRepository, model: ModelRepository):
+        super().__init__()
 
     def perform_rule_checking(self):
         # Implement the logic for rule-based conformance checking
         result = self.rule_conformance_checking()
-        print("Rule-based conformance checking performed")
+
         return result
 
     def perform_alignment_checking(self):
         # Implement the logic for alignment-based conformance checking
         self.alignment_conformance_checking()
-        print("Alignment-based conformance checking performed")
-
-    def is_event_log_loaded(self):
-        return self.event_log_loaded
-
-    def is_model_log_loaded(self):
-        return self.model_log_loaded
 
     def set_event_log_loaded(self, loaded, event_log: EventLog):
         self.event_log_loaded = loaded

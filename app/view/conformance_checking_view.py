@@ -1,27 +1,66 @@
 # app/view/conformance_checking_view.py
-from PySide6.QtGui import QGuiApplication
+from cProfile import label
+
+from PySide6.QtGui import QGuiApplication, Qt
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox, QScrollArea, QLabel
 
+from app.view.tabable_view import TabableView
+from app.viewmodel import EventLogListViewModel
+from app.viewmodel.model_list_viewmodel import ModelListViewModel
 
-class ConformanceCheckingView(QWidget):
-    def __init__(self, viewmodel, main_view):
+
+class ConformanceCheckingView(QWidget, TabableView):
+    def tab_name(self):
+        return 'Conformance Checking'
+
+    def closeable(self):
+        return False
+
+    def __init__(self, event_log_list_viewmodel: EventLogListViewModel, model_list_viewmodel: ModelListViewModel):
         super().__init__()
-        self.viewmodel = viewmodel
-        self.main_view = main_view
+        self._event_log_list_viewmodel = event_log_list_viewmodel
+        self._model_list_viewmodel = model_list_viewmodel
+
+        self.event_log = None
+        self.model = None
 
         self.layout = QVBoxLayout(self)
 
-        # Create the button
-        self.conformance_checking_button = QPushButton("Conformance checking")
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.conformance_checking_button = QPushButton('Conformance Checking')
+
         self.conformance_checking_button.clicked.connect(self.on_conformance_checking_button_clicked)
 
-        # Add the button to the layout
         self.layout.addWidget(self.conformance_checking_button)
 
-        self.update_button_state()
+        # Create the button
+        #self.conformance_checking_button = QPushButton("Conformance checking")
+        #self.conformance_checking_button.clicked.connect(self.on_conformance_checking_button_clicked)
+
+        # Add the button to the layout
+        #self.layout.addWidget(self.conformance_checking_button)
+        #self.layout.addWidget(self.conformance_checking_button)
+
+        #self.show_error_message()
+
+        event_log_list_viewmodel.selected_event_log_changed.connect(self.on_conformance_checking_alignment)
+        model_list_viewmodel.selected_model_changed.connect(self.on_conformance_checking_alignment)
+
+    def show_error_message(self):
+        error_message = QLabel("Please choose an event log and a model to do conformance checking")
+        self.layout.addWidget(error_message)
 
     def update_button_state(self):
-        self.conformance_checking_button.setEnabled(self.viewmodel.is_event_log_loaded())
+        #self.conformance_checking_button.setEnabled(self.viewmodel.is_event_log_loaded())
+        pass
+
+    def on_conformance_checking_alignment(self):
+        if self.model is None and self.event_log is None:
+            self.show_error_message()
+            return
+
+
 
     def on_conformance_checking_button_clicked(self):
         # Show a message box with options
@@ -38,15 +77,14 @@ class ConformanceCheckingView(QWidget):
             msg_box.close()
             return
 
-        self.viewmodel.set_active_event_log(self.viewmodel.event_log)
-        self.viewmodel.set_active_model_log(self.viewmodel.model_log)
+        #self.viewmodel.set_active_event_log(self.viewmodel.event_log)
+        #self.viewmodel.set_active_model_log(self.viewmodel.model_log)
 
         if msg_box.clickedButton() == rule_button:
             result = self.viewmodel.perform_rule_checking()
             self.main_view.display_result_in_tab(result, "Rule Checking Result")
         elif msg_box.clickedButton() == alignment_button:
             self.viewmodel.perform_alignment_checking()
-            self.main_view.display_alignment_in_tab()
 
     def show_result(self, result, title):
         msg_box = QMessageBox(self)
