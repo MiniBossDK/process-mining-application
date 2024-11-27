@@ -28,6 +28,7 @@ class ModelListView(QWidget):
         self.viewmodel.model_added.connect(self.on_model_added)
 
         self.add_button = QPushButton("Add Models")
+        self.add_button.clicked.connect(self.open_file_dialog)
         self.layout.addWidget(self.add_button)
 
     def on_model_added(self, model: Model):
@@ -40,8 +41,9 @@ class ModelListView(QWidget):
         for str_path in model_paths:
             path = Path(str_path)
             try:
-                model = Model(path.name, pm4py.discover_dcr(str_path))
+                model = Model(path.name, self.viewmodel.perform_discovery(path))
             except Exception:
+                failed_models.append(path.name)
                 continue
             self.viewmodel.add_model(model)
         if len(failed_models) > 0:  (
