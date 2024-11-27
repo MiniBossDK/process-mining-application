@@ -54,7 +54,7 @@ class MainView(QMainWindow):
 
         splitter.addWidget(self.tab_widget)
 
-        splitter.setSizes([150, 150, 300])
+        splitter.setSizes([150, 150, 800])
 
 
 
