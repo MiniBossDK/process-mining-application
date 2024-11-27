@@ -9,8 +9,18 @@ from pm4py import conformance_dcr
 
 class ConformanceCheckingViewModel(QObject):
 
-    def __init__(self, event_log: EventLogRepository, model: ModelRepository):
+    def _init_(self, event_log: EventLogRepository, model: ModelRepository):
         super().__init__()
+
+
+        self.event_dcr_graph = None
+        self.model_dcr_graph = None
+        self.event_log = None
+        self.model_log = None
+        self.event_log_loaded = False
+        self.model_log_loaded = False
+        self.active_event_log = None
+        self.active_model_log= None
 
     def perform_rule_checking(self):
         # Implement the logic for rule-based conformance checking
