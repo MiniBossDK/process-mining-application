@@ -6,3 +6,5 @@ Feature: Loading of event logs
     Given the process miner has successfully opened the application
     When they select the "Load Event Log" option and choose a valid XES file
     Then the application should load the event log data and display it in the list of event logs
+
+

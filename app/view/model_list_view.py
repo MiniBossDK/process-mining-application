@@ -8,10 +8,6 @@ from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QPushBu
 from app.model import DcrModel, PetriNetModel
 from app.viewmodel.model_list_viewmodel import ModelListViewModel
 
-class ModelType(Enum):
-    PETRI_NET = 1,
-    DCR = 2
-
 class ModelListView(QWidget):
 
     def __init__(self, viewmodel: ModelListViewModel):
@@ -35,18 +31,13 @@ class ModelListView(QWidget):
         self.list_widget.setSelectionMode(QListWidget.SelectionMode.SingleSelection)
 
         self.add_button = QPushButton("Add Models")
-        self.add_button.clicked.connect(self.open_option_panel)
+        self.add_button.clicked.connect(self.open_file_dialog)
         self.layout.addWidget(self.add_button)
 
     def on_model_added(self, model):
         item = QListWidgetItem(model.name)
         item.setData(Qt.ItemDataRole.UserRole, model)
-        model_type_name = ""
-        if isinstance(model, PetriNetModel):
-            model_type_name = "PetriNet"
-        elif isinstance(model, DcrModel):
-            model_type_name = "DCR"
-        item.setText("(" + model_type_name + ") " + model.name)
+        item.setText(model.name)
         self.list_widget.addItem(item)
 
     def add_dcr_model(self, model_paths):
@@ -84,38 +75,10 @@ class ModelListView(QWidget):
         elif isinstance(data, DcrModel):
             self.viewmodel.set_selected_dcr_model(data)
 
-    def open_option_panel(self):
-        self.dialog = QDialog(self)
 
-        self.dialog.setWindowTitle("Model type selection")
-        layout = QVBoxLayout()
-
-        option_panel_label = QLabel("Choose which type of model you want to load")
-
-        layout.addWidget(option_panel_label)
-
-        self.dialog.setLayout(layout)
-
-        hbox = QHBoxLayout()
-
-        layout.addLayout(hbox)
-
-        petri_net_btn = QPushButton("Petri Net")
-        dcr_btn = QPushButton("DCR")
-
-        petri_net_btn.clicked.connect(lambda: self.open_file_dialog(self.add_petri_net_model))
-        dcr_btn.clicked.connect(lambda: self.open_file_dialog(self.add_dcr_model))
-
-        hbox.addWidget(petri_net_btn)
-        hbox.addWidget(dcr_btn)
-
-        self.dialog.exec()
-
-
-    def open_file_dialog(self, callback):
-        self.dialog.close()
+    def open_file_dialog(self):
         file_dialog = QFileDialog(self)
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
         file_dialog.setNameFilter("All Event Log files (*.xes)")
-        file_dialog.filesSelected.connect(callback)
+        file_dialog.filesSelected.connect(self.add_petri_net_model)
         file_dialog.exec()
