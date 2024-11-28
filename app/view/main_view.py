@@ -28,7 +28,7 @@ class MainView(QMainWindow):
 
         # ViewModels
         self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_model)
-        #self.conformance_checking_viewmodel = ConformanceCheckingViewModel(self.event_log_model, self.model_list)
+        self.Conformance_checking_viewmodel = ConformanceCheckingViewModel(self.event_log_model, self.model_list)
         self.model_list_viewmodel = ModelListViewModel(self.model_list)
 
         from app.view import EventLogListView
@@ -48,10 +48,13 @@ class MainView(QMainWindow):
         self.graph_view = GraphView(self.event_log_list_viewmodel)
         from app.view import ConformanceCheckingView
         self.conformance_checking_view = ConformanceCheckingView(self.event_log_list_viewmodel,
-                                                                 self.model_list_viewmodel)
+                                                                 self.model_list_viewmodel,self.Conformance_checking_viewmodel)
 
         self.tab_widget = TabsView([self.event_log_table_view, self.graph_view, self.conformance_checking_view])
-
+        self.result_tab_widget = QTabWidget()
+        self.result_tab_widget.setTabsClosable(True)
+        self.result_tab_widget.tabCloseRequested.connect(self.close_result_tab)
+        #self.tab_widget.addTab(self.result_tab_widget, "ConformanceCheckResult")
         splitter.addWidget(self.tab_widget)
 
         splitter.setSizes([150, 150, 800])
