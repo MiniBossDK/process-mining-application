@@ -44,10 +44,10 @@ class EventLogListView(QWidget):
         for str_path in event_log_file_paths:
             path = Path(str_path)
             try:
-                event_log = EventLog(path.name, pm4py.read_xes(str_path), False)
+                self.viewmodel.add_event_log(path.name, path, False)
             except Exception:
+                failed_event_logs.append(path.name)
                 continue
-            self.viewmodel.add_event_log(event_log)
         if len(failed_event_logs) > 0:  (
             QMessageBox.critical(self, "File loading error", "The following files could not be loaded:\n" + "\n".join(failed_event_logs)))
 

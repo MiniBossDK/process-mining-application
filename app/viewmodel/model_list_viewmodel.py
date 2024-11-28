@@ -35,11 +35,14 @@ class ModelListViewModel(QObject):
     def load_xes_file(self, path: Path):
         return pm4py.read_xes(path.__str__())
 
-    def add_dcr_model(self, model: DcrModel):
+    def add_dcr_model(self, path: Path):
+        model = DcrModel(path.name, self.perform_discovery_dcr(path))
         self._dcr_model_repository.add_model(model)
         self.dcr_model_added.emit(model)
 
-    def add_petri_net_model(self, model: PetriNetModel):
+    def add_petri_net_model(self, path: Path):
+        petri_net, aligned_traces = self.perform_discovery_petri_net(path)
+        model = PetriNetModel(path.name, petri_net, aligned_traces)
         self._petri_net_model_repository.add_model(model)
         self.petri_net_model_added.emit(model)
 

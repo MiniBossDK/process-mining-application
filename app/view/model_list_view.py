@@ -54,11 +54,10 @@ class ModelListView(QWidget):
         for str_path in model_paths:
             path = Path(str_path)
             try:
-                model = DcrModel(path.name, self.viewmodel.perform_discovery_dcr(path))
+                self.viewmodel.add_dcr_model(path)
             except Exception:
                 failed_models.append(path.name)
                 continue
-            self.viewmodel.add_dcr_model(model)
         if len(failed_models) > 0:  (
             QMessageBox.critical(self, "File loading error",
                                  "The following files could not be loaded:\n" + "\n".join(failed_models)))
@@ -68,12 +67,11 @@ class ModelListView(QWidget):
         for str_path in model_paths:
             path = Path(str_path)
             try:
-                petri_net, aligned_traces = self.viewmodel.perform_discovery_petri_net(path)
-                model = PetriNetModel(path.name, petri_net, aligned_traces)
+                self.viewmodel.add_petri_net_model(path)
             except Exception as e:
                 failed_models.append(path.name)
                 continue
-            self.viewmodel.add_petri_net_model(model)
+
         if len(failed_models) > 0:  (
             QMessageBox.critical(self, "File loading error",
                                  "The following files could not be loaded:\n" + "\n".join(failed_models)))

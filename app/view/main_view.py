@@ -29,7 +29,7 @@ class MainView(QMainWindow):
 
         # ViewModels
         self.event_log_list_viewmodel = EventLogListViewModel(self.event_log_repository)
-        self.Conformance_checking_viewmodel = ConformanceCheckingViewModel(self.event_log_repository, self.dcr_model_repository)
+        self.Conformance_checking_viewmodel = ConformanceCheckingViewModel()
         self.model_list_viewmodel = ModelListViewModel(self.dcr_model_repository, self.petri_net_model_repository)
 
         from app.view import EventLogListView

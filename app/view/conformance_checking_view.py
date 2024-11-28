@@ -68,8 +68,10 @@ class ConformanceCheckingView(QWidget, TabableView):
             QMessageBox.critical(self, 'Conformance Checking Error',
                                  "The selected model must be a PetriNet model.")
             return
-
-        self._conformance_checking_viewmodel.alignment_conformance_checking(self.event_log, self.model)
+        try:
+            self._conformance_checking_viewmodel.alignment_conformance_checking(self.event_log, self.model)
+        except Exception as e:
+            QMessageBox.critical(self, 'Conformance Checking Error', "It was not possible to do conformance checking with alignment")
         self.dialog.close()
 
 

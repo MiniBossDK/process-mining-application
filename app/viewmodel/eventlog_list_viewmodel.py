@@ -1,5 +1,8 @@
+from pathlib import Path
+
 from PySide6.QtCore import QObject, Signal, Qt
 
+import pm4py
 from app.model import EventLog, EventLogRepository
 from app.model.repositories.dcr_model_repository import DcrModelRepository
 
@@ -16,6 +19,7 @@ class EventLogListViewModel(QObject):
         self._event_log_model.set_selected_event_log(event_log)
         self.selected_event_log_changed.emit(event_log)
 
-    def add_event_log(self, eventlog: EventLog):
-        self._event_log_model.add_event_log(eventlog)
-        self.event_log_added.emit(eventlog)
+    def add_event_log(self, name: str, path: Path, is_selected: bool):
+        event_log = EventLog(name, pm4py.read_xes(path.absolute().__str__()), is_selected)
+        self._event_log_model.add_event_log(event_log)
+        self.event_log_added.emit(event_log)

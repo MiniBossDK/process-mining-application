@@ -52,6 +52,7 @@ class ZoomWidget(QWidget):
         self.zoom_slider.setValue(self.default_zoom)
         self.zoom_slider.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
+        self.zoom_controls_layout.addStretch()
         self.zoom_controls_layout.addWidget(self.zoom_out_button)
         self.zoom_controls_layout.addWidget(self.zoom_slider)
         self.zoom_controls_layout.addWidget(self.zoom_in_button)
