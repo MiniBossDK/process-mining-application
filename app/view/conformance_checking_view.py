@@ -63,18 +63,6 @@ class ConformanceCheckingView(QWidget, TabableView):
     def update_conformance_state(self):
         self.can_do_conformance_checking = self.event_log is not None and self.model is not None
 
-    def hide_error_message(self):
-        if self._error_shown:  # Only hide if currently shown
-            if self._error_label is not None:
-                self.layout.removeWidget(self._error_label)
-                self._error_label.deleteLater()
-                self._error_label = None
-            self._error_shown=False
-
-    def update_button_state(self):
-        #self.conformance_checking_button.setEnabled(self.viewmodel.is_event_log_loaded())
-        pass
-
     def on_conformance_checking_alignment(self):
         if not isinstance(self.model, PetriNetModel) or self.event_log is None:
             QMessageBox.critical(self, 'Conformance Checking Error',
@@ -114,13 +102,10 @@ class ConformanceCheckingView(QWidget, TabableView):
 
         hbox = QHBoxLayout()
 
-        rule_checking_btn = QPushButton("Rule Checking")
         alignment_btn = QPushButton("Alignment")
 
         vbox.addLayout(hbox)
-        hbox.addWidget(rule_checking_btn)
         hbox.addWidget(alignment_btn)
 
         alignment_btn.clicked.connect(self.on_conformance_checking_alignment)
-        #rule_checking_btn.clicked.connect()
         self.dialog.exec()

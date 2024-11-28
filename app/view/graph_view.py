@@ -28,7 +28,7 @@ class GraphView(QWidget, TabableView):
 
         self.temp_svg_path = "temp_dcr_graph.svg"
 
-        self.zoom_widget = ZoomWidget(False, Path(self.temp_svg_path))
+        self.zoom_widget = ZoomWidget()
         self.layout.addWidget(self.zoom_widget)
 
         self.zoom_widget.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)

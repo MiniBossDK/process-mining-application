@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from PIL.ImageQt import QPixmap
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QSizePolicy
 
 
 class AlignmentView(QWidget):
@@ -12,10 +12,12 @@ class AlignmentView(QWidget):
 
         self.layout = QVBoxLayout(self)
 
-        from app.view import ZoomWidget
-        self.zoom_widget = ZoomWidget(True, file_path)
-        self.zoom_widget.set_path(self.file_path)
-        self.layout.addWidget(self.zoom_widget)
+        self.svg_widget = QSvgWidget(self)
+        self.svg_widget.setSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Maximum
+        )
+        self.layout.addWidget(self.svg_widget)
+        self.svg_widget.load(file_path.absolute().__str__())
 
         if os.path.exists(file_path):
             os.remove(file_path)
