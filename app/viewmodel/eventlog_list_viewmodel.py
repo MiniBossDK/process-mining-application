@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, Signal, Qt
 
 from app.model import EventLog, EventLogRepository
-from app.model.repositories.model_repository import ModelRepository
+from app.model.repositories.dcr_model_repository import DcrModelRepository
 
 
 class EventLogListViewModel(QObject):

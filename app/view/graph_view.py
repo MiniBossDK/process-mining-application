@@ -1,15 +1,16 @@
 import os
+from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtGui import QPixmap
+from PySide6.QtWidgets import QWidget, QVBoxLayout
 
 import pm4py
+from app.model import EventLog
+from app.view import ZoomWidget
 from app.view.tabable_view import TabableView
 from app.viewmodel import EventLogListViewModel
 from pm4py.visualization.dcr import visualizer as dcr_visualizer
-from app.model import EventLog
-from app.view import ZoomWidget
 
 
 class GraphView(QWidget, TabableView):
@@ -25,7 +26,9 @@ class GraphView(QWidget, TabableView):
         self.layout = QVBoxLayout(self)
         self._event_log_list_viewmodel = event_log_list_viewmodel
 
-        self.zoom_widget = ZoomWidget(False)
+        self.temp_svg_path = "temp_dcr_graph.svg"
+
+        self.zoom_widget = ZoomWidget(False, Path(self.temp_svg_path))
         self.layout.addWidget(self.zoom_widget)
 
         self.zoom_widget.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -53,5 +56,4 @@ class GraphView(QWidget, TabableView):
             if os.path.exists(temp_svg_path):
                 os.remove(temp_svg_path)
         except Exception as e:
-            print(f"Error generating the graph: {e}")
             self.zoom_widget.image_label.setText("Error Generating Graph")

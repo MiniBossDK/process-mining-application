@@ -2,6 +2,7 @@
 
 from app.model.repositories.eventlog_repository import EventLogRepository
 from .eventlog import EventLog
-from .model import Model
+from .dcr_model import DcrModel
+from .petrinet_model import PetriNetModel
 
-__all__ = ["EventLog", "EventLogRepository", "Model"]
+__all__ = ["EventLog", "EventLogRepository", "DcrModel", "PetriNetModel"]

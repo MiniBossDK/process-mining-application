@@ -1,9 +1,12 @@
 # app/view/conformance_checking_view.py
-from cProfile import label
+from pathlib import Path
 
 from PySide6.QtGui import QGuiApplication, Qt
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox, QScrollArea, QLabel
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QMessageBox, QScrollArea, QLabel, QDialog, QHBoxLayout, \
+    QTabWidget
 
+from app.model import PetriNetModel
+from app.view.alignment_view import AlignmentView
 from app.view.tabable_view import TabableView
 from app.viewmodel import EventLogListViewModel
 from app.viewmodel.conformence_checking_viewmodel import ConformanceCheckingViewModel
@@ -19,16 +22,22 @@ class ConformanceCheckingView(QWidget, TabableView):
 
     def __init__(self, event_log_list_viewmodel: EventLogListViewModel, model_list_viewmodel: ModelListViewModel, conformance_checking_viewmodel: ConformanceCheckingViewModel ):
         super().__init__()
+        self.dialog = None
         self.main_view = None
-        self.viewmodel = conformance_checking_viewmodel
+        self._conformance_checking_viewmodel = conformance_checking_viewmodel
         self._event_log_list_viewmodel = event_log_list_viewmodel
         self._model_list_viewmodel = model_list_viewmodel
         self._error_label = None
         self._error_shown = None
         self.event_log = None
         self.model = None
+        self.can_do_conformance_checking = False
 
         self.layout = QVBoxLayout(self)
+
+        self.conformance_checking_tabs = QTabWidget(self)
+
+        self.layout.addWidget(self.conformance_checking_tabs)
 
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -38,40 +47,21 @@ class ConformanceCheckingView(QWidget, TabableView):
 
         self.layout.addWidget(self.conformance_checking_button)
 
-        # Create the button
-        #self.conformance_checking_button = QPushButton("Conformance checking")
-        #self.conformance_checking_button.clicked.connect(self.on_conformance_checking_button_clicked)
+        self._event_log_list_viewmodel.selected_event_log_changed.connect(self.on_event_log_changed)
+        self._model_list_viewmodel.selected_petri_net_model_changed.connect(self.on_model_changed)
+        self._model_list_viewmodel.selected_dcr_model_changed.connect(self.on_model_changed)
+        self._conformance_checking_viewmodel.alignment_image_saved.connect(self.show_alignment)
 
-        # Add the button to the layout
-        #self.layout.addWidget(self.conformance_checking_button)
-        #self.layout.addWidget(self.conformance_checking_button)
+    def on_event_log_changed(self, event_log):
+        self.event_log = event_log
+        self.update_conformance_state()
 
-        #self.show_error_message()
+    def on_model_changed(self, model):
+        self.model = model
+        self.update_conformance_state()
 
-        self._event_log_list_viewmodel.event_log_added.connect(self._on_event_log_changed)
-        self._model_list_viewmodel.model_added.connect(self._on_model_changed)
-
-    def _on_event_log_changed(self):
-        self.event_log = self._event_log_list_viewmodel.set_selected_event_log
-        self._update_error_state()
-
-
-    def _on_model_changed(self):
-        self.model = self._model_list_viewmodel.set_selected_model
-        self._update_error_state()
-
-    def _update_error_state(self):
-        if self.event_log is None or self.model is None:
-            self.show_error_message()
-        else:
-            self.hide_error_message()
-
-    def show_error_message(self):
-        if not self._error_shown:
-            if self._error_label is None:
-                self._error_label = QLabel("Please choose an event log and a model to do conformance checking")
-                self.layout.addWidget(self._error_label)
-            self._error_shown = True
+    def update_conformance_state(self):
+        self.can_do_conformance_checking = self.event_log is not None and self.model is not None
 
     def hide_error_message(self):
         if self._error_shown:  # Only hide if currently shown
@@ -86,59 +76,51 @@ class ConformanceCheckingView(QWidget, TabableView):
         pass
 
     def on_conformance_checking_alignment(self):
-        if self.model is None and self.event_log is None:
-            self.show_error_message()
-        else:
-            self.hide_error_message()
+        if not isinstance(self.model, PetriNetModel) or self.event_log is None:
+            QMessageBox.critical(self, 'Conformance Checking Error',
+                                 "The selected model must be a PetriNet model.")
+            return
 
+        self._conformance_checking_viewmodel.alignment_conformance_checking(self.event_log, self.model)
+        self.dialog.close()
+
+
+    def show_alignment(self, path: Path):
+        tab_title = self.event_log.name + " <--> " + self.model.name
+        tab = AlignmentView(path)
+        index = self.conformance_checking_tabs.addTab(tab, tab_title)
+        self.conformance_checking_tabs.tabCloseRequested.connect(lambda: self.conformance_checking_tabs.removeTab(index))
+        self.conformance_checking_tabs.setTabsClosable(True)
 
 
     def on_conformance_checking_button_clicked(self):
-        # Show a message box with options
-        msg_box = QMessageBox(self)
-        msg_box.setWindowTitle("Choose Conformance Checking Method")
-        msg_box.setText("Please choose a conformance checking method:")
-        rule_button = msg_box.addButton("Rule Checking", QMessageBox.ButtonRole.AcceptRole)
-        alignment_button = msg_box.addButton("Alignment Checking", QMessageBox.ButtonRole.AcceptRole)
-        #msg_box.setStandardButtons(QMessageBox.StandardButton.Cancel)
-        #msg_box.setDefaultButton(QMessageBox.StandardButton.Cancel)
-        msg_box.exec()
 
-        if msg_box.result() == QMessageBox.DialogCode.Rejected:
-            msg_box.close()
+        if not self.can_do_conformance_checking:
+            QMessageBox.critical(self, 'Conformance Checking Error',
+                                 "Both a model and an event log need to be selected.")
             return
 
-        self.viewmodel.set_active_event_log(self.viewmodel.event_log)
-        self.viewmodel.set_active_model_log(self.viewmodel.model_log)
+        # Show a message box with options
+        self.dialog = QDialog(self)
+        self.dialog.setWindowTitle("Choose Conformance Checking Method")
 
-        if msg_box.clickedButton() == rule_button:
-            result = self.viewmodel.perform_rule_checking()
-            self.main_view.display_result_in_tab(result, "Rule Checking Result")
-        elif msg_box.clickedButton() == alignment_button:
-            self.viewmodel.perform_alignment_checking()
+        vbox = QVBoxLayout()
 
-    def show_result(self, result, title):
-        msg_box = QMessageBox(self)
-        msg_box.setWindowTitle(title)
+        self.dialog.setLayout(vbox)
 
-        scroll_area = QScrollArea(msg_box)
-        scroll_area.setWidgetResizable(True)
+        conformance_checking_method_label = QLabel("Please choose a conformance checking method")
 
-        content_widget = QWidget()
-        content_layout = QVBoxLayout(content_widget)
-        content_label = QLabel(result)
-        content_layout.addWidget(content_label)
-        scroll_area.setWidget(content_widget)
+        vbox.addWidget(conformance_checking_method_label)
 
-        screen = QGuiApplication.primaryScreen().availableGeometry()
-        scroll_area.setFixedHeight(screen.height() - 200)
-        scroll_area.setFixedWidth(screen.width() // 2)
+        hbox = QHBoxLayout()
 
-        msg_box.layout().addWidget(scroll_area)
+        rule_checking_btn = QPushButton("Rule Checking")
+        alignment_btn = QPushButton("Alignment")
 
-        msg_box.setMinimumHeight(screen.height() - 200)
+        vbox.addLayout(hbox)
+        hbox.addWidget(rule_checking_btn)
+        hbox.addWidget(alignment_btn)
 
-        msg_box.setMinimumWidth(screen.width() // 2)
-
-        #msg_box.setText(result)
-        msg_box.exec()
+        alignment_btn.clicked.connect(self.on_conformance_checking_alignment)
+        #rule_checking_btn.clicked.connect()
+        self.dialog.exec()

@@ -1,20 +1,21 @@
+import os
+from pathlib import Path
+
 from PIL.ImageQt import QPixmap
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
-from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtWidgets import QWidget, QVBoxLayout
 
 
 class AlignmentView(QWidget):
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: Path):
         super().__init__()
         self.file_path = file_path
 
         self.layout = QVBoxLayout(self)
 
         from app.view import ZoomWidget
-        self.zoom_widget = ZoomWidget(True)
+        self.zoom_widget = ZoomWidget(True, file_path)
+        self.zoom_widget.set_path(self.file_path)
         self.layout.addWidget(self.zoom_widget)
 
-        self.zoom_widget.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.zoom_widget.set_svg(file_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
