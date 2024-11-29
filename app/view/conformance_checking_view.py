@@ -51,6 +51,7 @@ class ConformanceCheckingView(QWidget, TabableView):
         self._model_list_viewmodel.selected_petri_net_model_changed.connect(self.on_model_changed)
         self._model_list_viewmodel.selected_dcr_model_changed.connect(self.on_model_changed)
         self._conformance_checking_viewmodel.alignment_image_saved.connect(self.show_alignment)
+        self.conformance_checking_tabs.tabCloseRequested.connect(self.close_tab)
 
     def on_event_log_changed(self, event_log):
         self.event_log = event_log
@@ -74,13 +75,14 @@ class ConformanceCheckingView(QWidget, TabableView):
             QMessageBox.critical(self, 'Conformance Checking Error', "It was not possible to do conformance checking with alignment")
         self.dialog.close()
 
-
     def show_alignment(self, path: Path):
         tab_title = self.event_log.name + " <--> " + self.model.name
         tab = AlignmentView(path)
-        index = self.conformance_checking_tabs.addTab(tab, tab_title)
-        self.conformance_checking_tabs.tabCloseRequested.connect(lambda: self.conformance_checking_tabs.removeTab(index))
+        self.conformance_checking_tabs.addTab(tab, tab_title)
         self.conformance_checking_tabs.setTabsClosable(True)
+
+    def close_tab(self, index):
+        self.conformance_checking_tabs.removeTab(index)
 
 
     def on_conformance_checking_button_clicked(self):
