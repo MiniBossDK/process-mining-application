@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QPixmap
+from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLabel,
     QSizePolicy, QScrollArea
@@ -6,9 +10,9 @@ from PySide6.QtWidgets import (
 
 
 class ZoomWidget(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.pixmap = None
+    def __init__(self):
+        super().__init__()
+        self.pixmap: QPixmap = None
         self.image_label = QLabel()
         self.min_zoom = 10
         self.max_zoom = 300
@@ -30,6 +34,11 @@ class ZoomWidget(QWidget):
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.image_label.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
 
+        self.zoom_out_button = QPushButton("-")
+        self.zoom_in_button = QPushButton("+")
+        self.zoom_slider = QSlider(Qt.Orientation.Horizontal)
+        self.zoom_label = QLabel(f"{self.default_zoom}%")
+
         self.scroll_area.setWidget(self.image_label)
 
         self.main_layout.addWidget(self.scroll_area)
@@ -37,11 +46,6 @@ class ZoomWidget(QWidget):
         self.zoom_controls_layout = QHBoxLayout()
         self.zoom_controls_layout.setContentsMargins(0, 5, 0, 0)
         self.zoom_controls_layout.setSpacing(5)
-
-        self.zoom_out_button = QPushButton("-")
-        self.zoom_in_button = QPushButton("+")
-        self.zoom_slider = QSlider(Qt.Orientation.Horizontal)
-        self.zoom_label = QLabel(f"{self.default_zoom}%")
 
         self.zoom_slider.setMinimum(self.min_zoom)
         self.zoom_slider.setMaximum(self.max_zoom)
@@ -74,8 +78,8 @@ class ZoomWidget(QWidget):
         self.zoom_slider.setValue(value)
 
     def zoom_image(self, value):
+        scale_factor = value / 100.0
         if self.pixmap:
-            scale_factor = value / 100.0
             new_size = self.pixmap.size() * scale_factor
             scaled_pixmap = self.pixmap.scaled(
                 new_size,
